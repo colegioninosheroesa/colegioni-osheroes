@@ -1,5 +1,5 @@
 <?php
-$destinatario = "informes@nh.edu.mx"; 
+$destinatario = "colegio.ninosheroes.a@gmail.com"; 
 $asunto = "Nueva Solicitud de Admisión - Colegio Niños Héroes";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
