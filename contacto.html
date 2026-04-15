@@ -6,6 +6,40 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilos para el Footer */
+        .footer-colegio { background-color: #193E9A; padding: 30px 0; margin-top: 50px; color: white; }
+        .texto-nowrap { white-space: nowrap; font-size: 0.95rem; }
+        .link-unete {
+            color: white !important; font-weight: 600; text-decoration: none; font-size: 0.9rem;
+            transition: all 0.3s ease; padding: 8px 18px; border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 25px; display: inline-block; white-space: nowrap;
+        }
+        .link-unete:hover { background-color: white; color: #193E9A !important; }
+
+        /* Corrección de visibilidad para Selectores */
+        select.form-control {
+            color: #495057 !important; /* Gris oscuro para el texto */
+            background-color: #ffffff !important;
+            height: auto !important;
+            padding: 10px !important;
+        }
+        
+        select.form-control option {
+            color: #212529 !important;
+            background-color: #fff !important;
+        }
+
+        .form-control { margin-bottom: 15px; border-radius: 8px; }
+        
+        .btn-institucional { 
+            background-color: #193E9A; color: white; border: none; padding: 12px 30px; 
+            border-radius: 25px; font-weight: bold; transition: 0.3s; width: 100%;
+        }
+        .btn-institucional:hover { background-color: #0d2561; cursor: pointer; color: white; }
+        
+        @media (max-width: 576px) { .texto-nowrap { white-space: normal; } }
+    </style>
 </head>
 <body>
     <div class="top-bar d-none d-md-block">
@@ -15,10 +49,10 @@
         </div>
     </div>
 
-    <nav class="navbar navbar-expand-lg sticky-top navbar-light">
+    <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="index.html">
-                <img src="Iconos/logo.png" class="logo-colegio" alt="Logo"> Colegio Niños Héroes
+                <img src="Iconos/logo.png" class="logo-colegio" alt="Logo" style="height: 50px;"> Colegio Niños Héroes
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -39,33 +73,34 @@
         </div>
     </nav>
 
-    <header class="hero">
+    <header class="hero" style="background: #193E9A; color: white; padding: 60px 0; text-align: center;">
         <div class="container">
-            <h1>Informes e Inscripciones</h1>
+            <h1 style="font-weight: 800;">Informes e Inscripciones</h1>
         </div>
     </header>
 
-    <section class="container mt-4">
-        <div class="form-container">
+    <section class="container mt-5">
+        <div class="form-container bg-white p-4 shadow-sm" style="border-radius: 15px;">
             <form action="https://formspree.io/f/xzdydopz" method="POST">
                 
-                <h4 style="color: var(--azul-id); margin-bottom: 20px;">Información del Alumno</h4>
+                <h4 style="color: #193E9A; margin-bottom: 20px; font-weight: 700;">Información del Alumno</h4>
                 <div class="row">
                     <div class="col-md-6">
-                        <input type="text" name="alumno_nombre" class="form-control" placeholder="Nombre(s) *" required>
+                        <input type="text" name="alumno_nombre" class="form-control" placeholder="Nombre(s) del alumno *" required>
                     </div>
                     <div class="col-md-3">
-                        <input type="text" name="alumno_apellido_paterno" class="form-control" placeholder="Primer apellido" required>
+                        <input type="text" name="alumno_apellido_p" class="form-control" placeholder="Primer apellido *" required>
                     </div>
                     <div class="col-md-3">
-                        <input type="text" name="alumno_apellido_materno" class="form-control" placeholder="Segundo apellido">
+                        <input type="text" name="alumno_apellido_m" class="form-control" placeholder="Segundo apellido">
                     </div>
                 </div>
 
-                <div class="row mt-3">
+                <div class="row mt-2">
                     <div class="col-md-6">
                         <label class="small font-weight-bold">Grado al que aspira *</label>
                         <select name="grado_aspira" class="form-control" required>
+                            <option value="" disabled selected>Seleccione una opción...</option>
                             <option value="Maternal">Maternal</option>
                             <option value="Preescolar">Preescolar</option>
                             <option value="Primaria">Primaria</option>
@@ -74,38 +109,37 @@
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label class="small font-weight-bold">Ciclo escolar</label>
-                        <select name="ciclo_escolar" class="form-control">
-                            <option>2026-2027</option>
-                            <option>2027-2028</option>
-                            <option>2028-2029</option>
-                            <option>2029-2030</option>
+                        <label class="small font-weight-bold">Ciclo escolar *</label>
+                        <select name="ciclo_escolar" class="form-control" required>
+                            <option value="" disabled selected>Seleccione el ciclo...</option>
+                            <option value="2026-2027">2026-2027</option>
+                            <option value="2027-2028">2027-2028</option>
+                            <option value="2028-2029">2028-2029</option>
+                            <option value="2029-2030">2029-2030</option>
                         </select>
                     </div>
                 </div>
 
-                <h4 class="mt-4" style="color: var(--azul-id); margin-bottom: 20px;">Padre o Tutor</h4>
+                <h4 class="mt-4" style="color: #193E9A; margin-bottom: 20px; font-weight: 700;">Datos del Padre o Tutor</h4>
                 <div class="row">
                     <div class="col-md-6">
                         <input type="text" name="tutor_nombre" class="form-control" placeholder="Nombre completo del tutor *" required>
                     </div>
                     <div class="col-md-6">
-                        <input type="email" name="tutor_email" class="form-control" placeholder="Correo electrónico *" required>
+                        <input type="email" name="tutor_email" class="form-control" placeholder="Correo electrónico de contacto *" required>
                     </div>
-                    <div class="col-md-6 mt-3">
+                    <div class="col-md-12 mt-2">
                         <input type="tel" name="tutor_whatsapp" class="form-control" placeholder="Número de WhatsApp (10 dígitos) *" required>
                     </div>
                 </div>
 
-                <input type="hidden" name="_subject" value="Nueva Solicitud de Informes - Web CNH">
+                <input type="hidden" name="_subject" value="Nueva Solicitud de Informes - Colegio Niños Héroes">
                 <input type="hidden" name="_language" value="es">
                 
-                <button type="submit" class="btn-institucional mt-4">Enviar Solicitud</button>
+                <button type="submit" class="btn-institucional mt-4">Enviar Solicitud de Información</button>
             </form>
         </div>
     </section>
-
-    <div style="margin-top: 50px; clear: both;"></div>
 
     <footer class="footer-colegio">
         <div class="container">
@@ -123,25 +157,6 @@
             </div>
         </div>
     </footer>
-
-    <style>
-        .footer-colegio { background-color: #193E9A; padding: 30px 0; margin-top: 50px; color: white; }
-        .texto-nowrap { white-space: nowrap; font-size: 0.95rem; }
-        .link-unete {
-            color: white !important; font-weight: 600; text-decoration: none; font-size: 0.9rem;
-            transition: all 0.3s ease; padding: 8px 18px; border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 25px; display: inline-block; white-space: nowrap;
-        }
-        .link-unete:hover { background-color: white; color: #193E9A !important; }
-        .form-control { margin-bottom: 10px; border-radius: 8px; }
-        .btn-institucional { 
-            background-color: #193E9A; color: white; border: none; padding: 10px 30px; 
-            border-radius: 25px; font-weight: bold; transition: 0.3s; width: 100%;
-        }
-        .btn-institucional:hover { background-color: #0d2561; cursor: pointer; }
-        
-        @media (max-width: 576px) { .texto-nowrap { white-space: normal; } }
-    </style>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
