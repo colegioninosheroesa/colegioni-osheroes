@@ -180,43 +180,51 @@
         }
     }
 </style>
-    <script>
-    // 1. ID EXCLUSIVO PARA ANUNCIOS (El primer archivo que mencionaste)
+   <script>
+    // 1. ID de tu archivo de Anuncios
     const idAnuncios = '18JCUK-SGSQCXMvWng3O3hZYxD4GU_BVILkvO_tawDZo';
 
     function cargarAviso(pestana) {
-        // Usamos el ID de anuncios para esta función
+        // La URL con 'gviz/tq' es la más confiable para leer pestañas específicas
         const url = `https://docs.google.com/spreadsheets/d/${idAnuncios}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(pestana)}`;
         
         Papa.parse(url, {
             download: true,
             complete: function(results) {
-                // Filtramos filas que no estén vacías
+                // Filtramos las filas para ignorar las que estén totalmente vacías
                 const filasConDatos = results.data.filter(fila => fila[0] && fila[0].trim() !== "");
                 
-                // Tomamos el mensaje de la segunda fila (A2), saltando el encabezado
-                const mensaje = filasConDatos[1] ? filasConDatos[1][0] : null;
-                
-                // Buscamos el ID en el HTML (ej: aviso-General, aviso-Kinder...)
                 const elemento = document.getElementById(`aviso-${pestana}`);
-                
-                if (mensaje && elemento) {
-                    elemento.innerText = mensaje;
-                } else if (elemento) {
+                if (!elemento) return;
+
+                if (filasConDatos.length > 0) {
+                    /* LÓGICA INTELIGENTE:
+                       - Si la pestaña es 'General' y tiene más de una fila, tomamos la segunda (A2).
+                       - Si no, o si es cualquier otra pestaña, tomamos la primera fila que tenga texto.
+                    */
+                    if (pestana === 'General' && filasConDatos.length > 1) {
+                        elemento.innerText = filasConDatos[1][0];
+                    } else {
+                        elemento.innerText = filasConDatos[0][0];
+                    }
+                } else {
                     elemento.innerText = "Sin avisos recientes por el momento.";
                 }
             },
             error: function(err) {
-                console.error("Error al conectar con la pestaña de anuncios: " + pestana);
+                console.error("Error al conectar con la pestaña: " + pestana, err);
+                const elemento = document.getElementById(`aviso-${pestana}`);
+                if (elemento) elemento.innerText = "Error al cargar aviso.";
             }
         });
     }
 
-    // Se ejecuta al abrir la página de Comunidad
+    // Función que se ejecuta al cargar la página
     window.onload = function() {
-        // Estas son las pestañas exactas de tu primer archivo de excel
+        // Lista exacta de tus pestañas en el Excel
         const seccionesAnuncios = ['General', 'Kinder', 'Primaria', 'Secundaria', 'Preparatoria'];
         
+        // Lanzamos la carga de todas las pestañas simultáneamente
         seccionesAnuncios.forEach(s => {
             cargarAviso(s);
         });
