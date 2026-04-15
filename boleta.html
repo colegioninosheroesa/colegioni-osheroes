@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Consulta de calificaciones - Colegio Niños Héroes</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        .btn-volver {
+            border: 2px solid var(--azul-id);
+            color: var(--azul-id);
+            font-weight: 700;
+            border-radius: 10px;
+            padding: 5px 20px;
+            transition: 0.3s;
+            text-decoration: none !important;
+        }
+        .btn-volver:hover { background: var(--azul-id); color: white; }
+
+        .search-hero {
+            background: linear-gradient(135deg, var(--azul-id), #0d2561);
+            height: 150px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            color: white; 
+            border-radius: 0 0 50px 50px;
+            margin-bottom: 40px;
+        }
+
+        .report-card-container {
+            background: white;
+            padding: 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            display: none; 
+            margin-bottom: 60px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .report-header {
+            border-bottom: 3px double var(--azul-id);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .grade-table { width: 100%; border: 2px solid #333; }
+        .grade-table th, .grade-table td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .grade-table th { background: #f4f4f4; font-weight: 700; }
+
+        .footer-colegio { background-color: #193E9A; padding: 30px 0; margin-top: 50px; color: white; }
+        .texto-nowrap { white-space: nowrap; font-size: 0.95rem; }
+        .link-unete {
+            color: white !important; font-weight: 600; text-decoration: none; font-size: 0.9rem;
+            padding: 8px 18px; border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 25px;
+            display: inline-block; white-space: nowrap; transition: 0.3s;
+        }
+        .link-unete:hover { background-color: white; color: #193E9A !important; }
+
+        @media print {
+            .navbar, .search-hero, footer, .btn-volver, .input-group, .instruccion, .btn-print-box { display: none !important; }
+            .report-card-container { display: block !important; border: none; box-shadow: none; margin: 0; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand" href="index.html">
+                <img src="../Iconos/logo.png" class="logo-colegio" style="height: 50px;"> Colegio Niños Héroes
+            </a>
+            <a href="comunidad.html" class="btn-volver">← Volver</a>
+        </div>
+    </nav>
+
+    <div class="search-hero">
+        <h1 style="font-weight: 800; font-size: 1.8rem; margin: 0;">Boleta de Calificaciones</h1>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-6 text-center">
+                <p class="instruccion">Ingrese la matrícula del alumno:</p>
+                <div class="input-group input-group-lg">
+                    <input type="text" id="matriculaInput" class="form-control" placeholder="Matrícula..." style="border-radius: 30px 0 0 30px;">
+                    <div class="input-group-append">
+                        <button class="btn" onclick="buscarBoleta()" style="background: var(--verde-id); color: white; border-radius: 0 30px 30px 0; padding: 0 30px; font-weight: 700;">Buscar</button>
+                    </div>
+                </div>
+                <div id="statusMsg" class="mt-3"></div>
+            </div>
+        </div>
+
+        <div id="reportCard" class="report-card-container">
+            <div class="text-right mb-3 btn-print-box">
+                <button class="btn btn-danger" onclick="window.print()">Descargar PDF</button>
+            </div>
+
+            <div class="report-header">
+                <div class="row align-items-center">
+                    <div class="col-8">
+                        <h2 style="color: var(--azul-id); font-weight: 900; margin: 0;">Colegio Niños Héroes</h2>
+                        <p class="text-muted m-0" id="displayNivel">Reporte oficial de progreso académico</p>
+                    </div>
+                    <div class="col-4 text-right">
+                        <p class="m-0"><strong>Ciclo:</strong> 2026-2027</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div><strong>Alumno:</strong> <span id="displayName">---</span></div>
+                <div><strong>Matrícula:</strong> <span id="displayMatricula">---</span></div>
+                <div><strong>Grado y Grupo:</strong> <span id="displayGradoGrupo">---</span></div>
+                <div><strong>Estatus:</strong> Alumno Regular</div>
+            </div>
+
+            <table class="grade-table">
+                <thead id="tableHeader"></thead>
+                <tbody id="gradeRows"></tbody>
+                <tfoot>
+                    <tr style="background: #f4f4f4; font-weight: 800; font-size: 1.1rem;">
+                        <td id="promedioLabel" style="text-align: right;">PROMEDIO GENERAL FINAL:</td>
+                        <td id="displayPromedio" colspan="2" style="color: var(--azul-id);">---</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="row mt-5">
+                <div class="col-6 text-center">
+                    <div style="border-top: 1px solid #000; width: 200px; margin: 0 auto; padding-top: 5px;">
+                        <p class="small">Firma del padre o tutor</p>
+                    </div>
+                </div>
+                <div class="col-6 text-center">
+                    <div style="border-top: 1px solid #000; width: 200px; margin: 0 auto; padding-top: 5px;">
+                        <p class="small">Sello de la institución</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-colegio">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8 text-center text-md-left mb-3 mb-md-0">
+                    <p class="mb-0 text-white texto-nowrap">
+                        © 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos reservados.
+                    </p>
+                </div>
+                <div class="col-md-4 text-center text-md-right">
+                    <a href="bolsa-trabajo.html" class="link-unete">
+                        <i class="fas fa-briefcase mr-2"></i>Únete a nuestro equipo
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Configuración de IDs
+    const sheetID = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6m0pTs'; 
+    const niveles = ['Kinder', 'Primaria', 'Secundaria', 'Preparatoria'];
+
+    async function buscarBoleta() {
+        const matricula = document.getElementById('matriculaInput').value.trim();
+        const status = document.getElementById('statusMsg');
+        
+        if (!matricula) {
+            status.innerHTML = "<span class='text-warning'>Por favor, ingrese una matrícula.</span>";
+            return;
+        }
+
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando en los registros escolares...";
+        let alumnoEncontrado = null;
+        let nivelEncontrado = "";
+
+        // Buscamos en cada pestaña del Excel
+        for (let nivel of niveles) {
+            const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nivel)}`;
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error("Error de conexión");
+                
+                const csvText = await res.text();
+                const data = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
+                
+                // Buscamos coincidencia exacta en la columna 'Matricula'
+                const alumno = data.find(row => row.Matricula && row.Matricula.toString().trim() === matricula);
+                
+                if (alumno) {
+                    alumnoEncontrado = alumno;
+                    nivelEncontrado = nivel;
+                    break; 
+                }
+            } catch (e) {
+                console.error("Error consultando nivel " + nivel + ": ", e);
+            }
+        }
+
+        if (alumnoEncontrado) {
+            status.innerHTML = "<span class='text-success'>¡Registro encontrado!</span>";
+            renderBoleta(alumnoEncontrado, nivelEncontrado);
+        } else {
+            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Verifique los datos o contacte a administración.</span>";
+            document.getElementById('reportCard').style.display = 'none';
+        }
+    }
+
+    function renderBoleta(alumno, nivel) {
+        // 1. Mostrar el contenedor y llenar datos básicos
+        document.getElementById('reportCard').style.display = 'block';
+        document.getElementById('displayName').innerText = alumno.Nombre || '---';
+        document.getElementById('displayMatricula').innerText = alumno.Matricula || '---';
+        document.getElementById('displayGradoGrupo').innerText = `${alumno.Grado || ''} ${alumno.Grupo || ''}`;
+        document.getElementById('displayNivel').innerText = `Boleta Oficial - Nivel ${nivel}`;
+
+        const esPrepa = (nivel === 'Preparatoria');
+        
+        // 2. Configurar Encabezados de la Tabla
+        let header = `<tr><th style="text-align:left; width:40%;">Materia / Asignatura</th>`;
+        if (esPrepa) {
+            header += `<th>P1</th><th>P2</th><th>Final</th></tr>`;
+        } else {
+            header += `<th>P1</th><th>P2</th><th>P3</th><th>Final</th></tr>`;
+        }
+        document.getElementById('tableHeader').innerHTML = header;
+
+        // 3. Identificar Materias dinámicamente
+        // Busca todas las columnas que terminen en _P1 para saber qué materias existen
+        const materiasKeys = Object.keys(alumno).filter(k => k.endsWith('_P1'));
+        const nombresMaterias = materiasKeys.map(k => k.replace('_P1', ''));
+        
+        let htmlRows = "";
+        nombresMaterias.forEach(materia => {
+            const p1 = alumno[materia + '_P1'] || '-';
+            const p2 = alumno[materia + '_P2'] || '-';
+            const p3 = alumno[materia + '_P3'] || '-';
+            const final = alumno[materia + '_Final'] || '-';
+
+            htmlRows += `
+                <tr>
+                    <td style="text-align:left; font-weight:600;">${materia.replace(/_/g, ' ')}</td>
+                    <td>${p1}</td>
+                    <td>${p2}</td>
+                    ${!esPrepa ? `<td>${p3}</td>` : ''}
+                    <td style="font-weight:bold; background:#f9f9f9; color:var(--azul-id);">${final}</td>
+                </tr>`;
+        });
+
+        // 4. Inyectar filas y calcular el promedio final
+        document.getElementById('gradeRows').innerHTML = htmlRows;
+        
+        // Ajuste de visualización del promedio
+        const valorPromedio = alumno['Promedio Final'] || alumno['Promedio'] || '0.0';
+        document.getElementById('displayPromedio').innerText = valorPromedio;
+        
+        // Ajustamos los colSpan para que la tabla no se mueva
+        document.getElementById('promedioLabel').colSpan = 1; 
+        document.getElementById('displayPromedio').colSpan = esPrepa ? 3 : 4;
+
+        // Auto-scroll hacia la boleta para dispositivos móviles
+        document.getElementById('reportCard').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+</body>
+</html>

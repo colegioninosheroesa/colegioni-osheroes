@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Bolsa de Trabajo - Colegio Niños Héroes</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="top-bar d-none d-md-block">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div><i class="fas fa-envelope mr-1"></i> informes@nh.edu.mx | 56 3403 0770</div>
+            <div><a href="#"><i class="fab fa-facebook-f"></i></a></div>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg sticky-top navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="../Iconos/logo.png" class="logo-colegio"> Colegio Niños Héroes
+            </a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Nosotros</a></li>
+                    <li class="nav-item"><a class="nav-link" href="oferta.html">Oferta Educativa</a></li>
+                    <li class="nav-item"><a class="nav-link" href="comunidad.html">Comunidad</a></li>
+                    <li class="nav-item"><a class="nav-link mr-lg-3" href="contacto.html">Contacto</a></li>
+                    <li class="nav-item"><a class="btn btn-whatsapp-nav" href="https://wa.me/5634030770" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero"><div class="container"><h1>Únete a nuestro Equipo</h1></div></header>
+
+    <section class="container mt-4 mb-5">
+        <div class="form-container card-moderna p-4 shadow-sm">
+            <form>
+                <h4 style="color: var(--azul-id); margin-bottom: 20px;">Datos Personales</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-3"><input type="text" class="form-control" placeholder="Nombre(s) *"></div>
+                    <div class="col-md-6 mb-3"><input type="text" class="form-control" placeholder="Apellidos *"></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3"><input type="email" class="form-control" placeholder="Correo electrónico *"></div>
+                    <div class="col-md-6 mb-3"><input type="tel" class="form-control" placeholder="Teléfono / WhatsApp *"></div>
+                </div>
+
+                <h4 class="mt-4" style="color: var(--azul-id); margin-bottom: 20px;">Perfil Profesional</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="small font-weight-bold">Área de interés *</label>
+                        <select class="form-control">
+                            <option>Docencia Preescolar</option>
+                            <option>Docencia Primaria</option>
+                            <option>Docencia Secundaria / Preparatoria</option>
+                            <option>Administración</option>
+                            <option>Mantenimiento / Intendencia</option>
+                            <option>Inglés / Idiomas</option>
+                            <option>Extracurriculares / After School</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small font-weight-bold">Último grado de estudios</label>
+                        <input type="text" class="form-control" placeholder="Ej. Licenciatura en Educación">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label class="small font-weight-bold">Adjuntar CV (PDF o Word) *</label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="customFile" accept=".pdf,.doc,.docx">
+                            <label class="custom-file-label" for="customFile">Seleccionar archivo...</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <textarea class="form-control" rows="3" placeholder="Cuéntanos brevemente sobre tu experiencia..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-institucional mt-4">Enviar Postulación</button>
+            </form>
+        </div>
+    </section>
+
+      <div style="margin-top: 50px; clear: both;"></div>
+<footer class="footer-colegio">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8 text-center text-md-left mb-3 mb-md-0">
+                <p class="mb-0 text-white texto-nowrap">
+                    © 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos reservados.
+                </p>
+            </div>
+            
+            <div class="col-md-4 text-center text-md-right">
+                <a href="bolsa-trabajo.html" class="link-unete">
+                    <i class="fas fa-briefcase mr-2"></i>Únete a nuestro equipo
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .footer-colegio {
+        background-color: #193E9A;
+        padding: 30px 0;
+        margin-top: 50px;
+        color: white;
+    }
+
+    /* Esta regla evita que el texto se divida en dos renglones */
+    .texto-nowrap {
+        white-space: nowrap;
+        font-size: 0.95rem; /* Ajuste ligero de tamaño para asegurar espacio */
+    }
+
+    .link-unete {
+        color: white !important;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        padding: 8px 18px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 25px;
+        display: inline-block;
+        white-space: nowrap; /* Evita que el botón también se deforme */
+    }
+
+    .link-unete:hover {
+        background-color: white;
+        color: #193E9A !important;
+        text-decoration: none;
+    }
+
+    /* Ajuste para tablets y pantallas pequeñas */
+    @media (max-width: 991px) {
+        .texto-nowrap {
+            font-size: 0.85rem;
+        }
+    }
+
+    /* En celulares muy pequeños sí permitimos que se divida para que no se salga de la pantalla */
+    @media (max-width: 576px) {
+        .texto-nowrap {
+            white-space: normal;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+</body>
+</html>
