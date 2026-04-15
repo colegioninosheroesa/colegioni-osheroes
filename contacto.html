@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Colegio Niños Héroes</title>
+    <title>Contacto e Inscripciones - Colegio Niños Héroes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="style.css">
@@ -18,127 +18,132 @@
     <nav class="navbar navbar-expand-lg sticky-top navbar-light">
         <div class="container">
             <a class="navbar-brand" href="index.html">
-                <img src="Iconos/logo.png" class="logo-colegio"> Colegio Niños Héroes
+                <img src="Iconos/logo.png" class="logo-colegio" alt="Logo"> Colegio Niños Héroes
             </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link active" href="index.html">Nosotros</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html">Nosotros</a></li>
                     <li class="nav-item"><a class="nav-link" href="oferta.html">Oferta Educativa</a></li>
                     <li class="nav-item"><a class="nav-link" href="comunidad.html">Comunidad</a></li>
-                    <li class="nav-item"><a class="nav-link mr-lg-3" href="contacto.html">Contacto</a></li>
-                    <li class="nav-item"><a class="btn btn-whatsapp-nav" href="https://wa.me/5634030770" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                    <li class="nav-item"><a class="nav-link active mr-lg-3" href="contacto.html">Contacto</a></li>
+                    <li class="nav-item">
+                        <a class="btn btn-whatsapp-nav" href="https://wa.me/5634030770" target="_blank">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
-    <header class="hero"><div class="container"><h1>Informes e Inscripciones</h1></div></header>
+
+    <header class="hero">
+        <div class="container">
+            <h1>Informes e Inscripciones</h1>
+        </div>
+    </header>
+
     <section class="container mt-4">
         <div class="form-container">
-            <form>
+            <form action="https://formspree.io/f/xzdydopz" method="POST">
+                
                 <h4 style="color: var(--azul-id); margin-bottom: 20px;">Información del Alumno</h4>
                 <div class="row">
-                    <div class="col-md-6"><input type="text" class="form-control" placeholder="Nombre(s) *"></div>
-                    <div class="col-md-3"><input type="text" class="form-control" placeholder="Primer apellido"></div>
-                    <div class="col-md-3"><input type="text" class="form-control" placeholder="Segundo apellido"></div>
+                    <div class="col-md-6">
+                        <input type="text" name="alumno_nombre" class="form-control" placeholder="Nombre(s) *" required>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="alumno_apellido_paterno" class="form-control" placeholder="Primer apellido" required>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="alumno_apellido_materno" class="form-control" placeholder="Segundo apellido">
+                    </div>
                 </div>
-                <div class="row">
+
+                <div class="row mt-3">
                     <div class="col-md-6">
                         <label class="small font-weight-bold">Grado al que aspira *</label>
-                        <select class="form-control">
-                            <option>Maternal</option>
-                            <option>Preescolar</option>
-                            <option>Primaria</option>
-                            <option>Secundaria</option>
-                            <option>Preparatoria</option>
+                        <select name="grado_aspira" class="form-control" required>
+                            <option value="Maternal">Maternal</option>
+                            <option value="Preescolar">Preescolar</option>
+                            <option value="Primaria">Primaria</option>
+                            <option value="Secundaria">Secundaria</option>
+                            <option value="Preparatoria">Preparatoria</option>
                         </select>
                     </div>
                     <div class="col-md-6">
                         <label class="small font-weight-bold">Ciclo escolar</label>
-                        <select class="form-control">
-                            <option>2026-2027</option><option>2027-2028</option><option>2028-2029</option>
-                            <option>2029-2030</option><option>2030-2031</option><option>2031-2032</option>
-                            <option>2032-2033</option><option>2033-2034</option><option>2034-2035</option>
-                            <option>2035-2036</option>
+                        <select name="ciclo_escolar" class="form-control">
+                            <option>2026-2027</option>
+                            <option>2027-2028</option>
+                            <option>2028-2029</option>
+                            <option>2029-2030</option>
                         </select>
                     </div>
                 </div>
+
                 <h4 class="mt-4" style="color: var(--azul-id); margin-bottom: 20px;">Padre o Tutor</h4>
                 <div class="row">
-                    <div class="col-md-6"><input type="text" class="form-control" placeholder="Nombre"></div>
-                    <div class="col-md-6"><input type="text" class="form-control" placeholder="Apellidos"></div>
-                    <div class="col-md-6"><input type="email" class="form-control" placeholder="Email"></div>
-                    <div class="col-md-6"><input type="tel" class="form-control" placeholder="WhatsApp *"></div>
+                    <div class="col-md-6">
+                        <input type="text" name="tutor_nombre" class="form-control" placeholder="Nombre completo del tutor *" required>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="email" name="tutor_email" class="form-control" placeholder="Correo electrónico *" required>
+                    </div>
+                    <div class="col-md-6 mt-3">
+                        <input type="tel" name="tutor_whatsapp" class="form-control" placeholder="Número de WhatsApp (10 dígitos) *" required>
+                    </div>
                 </div>
-                <button type="submit" class="btn-institucional mt-3">Enviar</button>
+
+                <input type="hidden" name="_subject" value="Nueva Solicitud de Informes - Web CNH">
+                <input type="hidden" name="_language" value="es">
+                
+                <button type="submit" class="btn-institucional mt-4">Enviar Solicitud</button>
             </form>
         </div>
     </section>
-     <div style="margin-top: 50px; clear: both;"></div>
-<footer class="footer-colegio">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8 text-center text-md-left mb-3 mb-md-0">
-                <p class="mb-0 text-white texto-nowrap">
-                    © 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos reservados.
-                </p>
-            </div>
-            
-            <div class="col-md-4 text-center text-md-right">
-                <a href="bolsa-trabajo.html" class="link-unete">
-                    <i class="fas fa-briefcase mr-2"></i>Únete a nuestro equipo
-                </a>
+
+    <div style="margin-top: 50px; clear: both;"></div>
+
+    <footer class="footer-colegio">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8 text-center text-md-left mb-3 mb-md-0">
+                    <p class="mb-0 text-white texto-nowrap">
+                        © 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos reservados.
+                    </p>
+                </div>
+                <div class="col-md-4 text-center text-md-right">
+                    <a href="bolsa-trabajo.html" class="link-unete">
+                        <i class="fas fa-briefcase mr-2"></i>Únete a nuestro equipo
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-</footer>
+    </footer>
 
-<style>
-    .footer-colegio {
-        background-color: #193E9A;
-        padding: 30px 0;
-        margin-top: 50px;
-        color: white;
-    }
-
-    /* Esta regla evita que el texto se divida en dos renglones */
-    .texto-nowrap {
-        white-space: nowrap;
-        font-size: 0.95rem; /* Ajuste ligero de tamaño para asegurar espacio */
-    }
-
-    .link-unete {
-        color: white !important;
-        font-weight: 600;
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-        padding: 8px 18px;
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        border-radius: 25px;
-        display: inline-block;
-        white-space: nowrap; /* Evita que el botón también se deforme */
-    }
-
-    .link-unete:hover {
-        background-color: white;
-        color: #193E9A !important;
-        text-decoration: none;
-    }
-
-    /* Ajuste para tablets y pantallas pequeñas */
-    @media (max-width: 991px) {
-        .texto-nowrap {
-            font-size: 0.85rem;
+    <style>
+        .footer-colegio { background-color: #193E9A; padding: 30px 0; margin-top: 50px; color: white; }
+        .texto-nowrap { white-space: nowrap; font-size: 0.95rem; }
+        .link-unete {
+            color: white !important; font-weight: 600; text-decoration: none; font-size: 0.9rem;
+            transition: all 0.3s ease; padding: 8px 18px; border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 25px; display: inline-block; white-space: nowrap;
         }
-    }
-
-    /* En celulares muy pequeños sí permitimos que se divida para que no se salga de la pantalla */
-    @media (max-width: 576px) {
-        .texto-nowrap {
-            white-space: normal;
-            font-size: 0.9rem;
+        .link-unete:hover { background-color: white; color: #193E9A !important; }
+        .form-control { margin-bottom: 10px; border-radius: 8px; }
+        .btn-institucional { 
+            background-color: #193E9A; color: white; border: none; padding: 10px 30px; 
+            border-radius: 25px; font-weight: bold; transition: 0.3s; width: 100%;
         }
-    }
-</style>
+        .btn-institucional:hover { background-color: #0d2561; cursor: pointer; }
+        
+        @media (max-width: 576px) { .texto-nowrap { white-space: normal; } }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>
