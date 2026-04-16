@@ -181,7 +181,8 @@
     const niveles = ['Kinder', 'Primaria', 'Secundaria', 'Preparatoria'];
 
     async function buscarBoleta() {
-        const matriculaInput = document.getElementById('matriculaInput').value.trim();
+        const inputRaw = document.getElementById('matriculaInput').value;
+        const matriculaInput = inputRaw.trim(); // Mantenemos espacios si los hubiera, pero limpiamos extremos
         const status = document.getElementById('statusMsg');
         
         if (!matriculaInput) {
@@ -189,36 +190,42 @@
             return;
         }
 
-        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando...";
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Conectando con la base de datos...";
         let alumnoEncontrado = null;
         let nivelEncontrado = "";
 
         for (let nivel of niveles) {
+            // El parámetro 'cb' asegura que Google no nos de un archivo viejo guardado en caché
             const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nivel)}&tqx=cb:${Date.now()}`;
             
             try {
                 const res = await fetch(url);
                 const csvText = await res.text();
-                const data = Papa.parse(csvText, { header: false, skipEmptyLines: true }).data;
                 
-                if (!data || data.length < 2) continue;
+                // Si el CSV está casi vacío, saltar pestaña
+                if (csvText.length < 50) {
+                    console.warn(`La pestaña ${nivel} parece no estar publicada correctamente.`);
+                    continue;
+                }
 
-                // En tu imagen, la fila 0 son materias y la fila 1 son subheaders (Matricula, Nombre...)
-                const materiasRow = data[0]; 
+                const data = Papa.parse(csvText, { header: false, skipEmptyLines: true }).data;
+                if (data.length < 3) continue;
+
                 const subHeadersRow = data[1]; 
                 const alumnosData = data.slice(2); 
 
-                // Buscamos al alumno en la Columna A (índice 0)
+                // --- DIAGNÓSTICO EN CONSOLA ---
+                // Esto te permitirá ver en F12 qué está leyendo el código realmente
+                console.log(`Buscando "${matriculaInput}" en nivel ${nivel}. Primera matrícula en Excel: "${alumnosData[0][0]}"`);
+
                 const filaAlumno = alumnosData.find(row => {
                     if (!row[0]) return false;
-                    // Limpiamos la matrícula del Excel de espacios y caracteres raros
+                    // Limpieza extrema de caracteres invisibles (Zero Width Spaces)
                     const matExcel = row[0].toString().replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
                     return matExcel === matriculaInput;
                 });
                 
                 if (filaAlumno) {
-                    console.log("¡Alumno localizado en " + nivel + "!", filaAlumno);
-
                     const getCol = (name) => subHeadersRow.findIndex(c => 
                         c && c.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().includes(name.toLowerCase())
                     );
@@ -228,7 +235,7 @@
                         Matricula: filaAlumno[0], 
                         Grado: filaAlumno[getCol('grado')] || '',
                         Grupo: filaAlumno[getCol('grupo')] || '',
-                        Ciclo: filaAlumno[getCol('ciclo')] || '2025-2026',
+                        Ciclo: filaAlumno[getCol('ciclo')] || 'No definido',
                         PromedioFinalCiclo: filaAlumno[getCol('promedio final')] || '0.0',
                         Materias: []
                     };
@@ -237,6 +244,7 @@
                     const inicioNotas = subHeadersRow.findIndex(c => c === 'T1' || c === 'S1');
 
                     if (inicioNotas !== -1) {
+                        const materiasRow = data[0];
                         for(let i = inicioNotas; i < materiasRow.length; i++) {
                             let mNombre = materiasRow[i] ? materiasRow[i].trim() : "";
                             if(mNombre !== "" && !mNombre.toUpperCase().includes('PROMEDIO FINAL')) {
@@ -255,15 +263,15 @@
                     break; 
                 }
             } catch (e) {
-                console.error("Error en nivel " + nivel, e);
+                console.error("Error crítico en nivel " + nivel, e);
             }
         }
 
         if (alumnoEncontrado) {
-            status.innerHTML = "<span class='text-success'>¡Registro encontrado!</span>";
+            status.innerHTML = "<span class='text-success'>¡Alumno encontrado! Generando boleta...</span>";
             renderBoleta(alumnoEncontrado, nivelEncontrado);
         } else {
-            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Revisa que el Excel esté publicado.</span>";
+            status.innerHTML = "<span class='text-danger'>Matrícula no reconocida. Asegúrese de que el Excel esté 'Publicado en la Web' como CSV.</span>";
             document.getElementById('reportCard').style.display = 'none';
         }
     }
@@ -295,6 +303,7 @@
         document.getElementById('gradeRows').innerHTML = hBody;
         document.getElementById('displayPromedio').innerText = alumno.PromedioFinalCiclo;
         document.getElementById('promedioLabel').colSpan = esPrepa ? 3 : 4;
+        
         setTimeout(() => document.getElementById('reportCard').scrollIntoView({ behavior: 'smooth' }), 100);
     }
 </script>
