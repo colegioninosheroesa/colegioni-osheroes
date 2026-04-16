@@ -181,61 +181,68 @@
     const niveles = ['Kinder', 'Primaria', 'Secundaria', 'Preparatoria'];
 
     async function buscarBoleta() {
-        const matricula = document.getElementById('matriculaInput').value.trim();
+        const matriculaInput = document.getElementById('matriculaInput').value.trim().toUpperCase();
         const status = document.getElementById('statusMsg');
         
-        if (!matricula) {
+        if (!matriculaInput) {
             status.innerHTML = "<span class='text-warning'>Por favor, ingrese una matrícula.</span>";
             return;
         }
 
-        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Accediendo a los registros...";
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando en todas las secciones...";
         let alumnoEncontrado = null;
         let nivelEncontrado = "";
 
         for (let nivel of niveles) {
-            const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nivel)}`;
+            // Añadimos tqx=cb: para evitar que Google nos de datos viejos (Caché)
+            const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nivel)}&tqx=cb:${Date.now()}`;
+            
             try {
                 const res = await fetch(url);
                 const csvText = await res.text();
                 const data = Papa.parse(csvText, { header: false, skipEmptyLines: true }).data;
                 
+                // Si la hoja no tiene suficientes filas, saltar
                 if (!data || data.length < 2) continue;
 
                 const materiasRow = data[0]; 
                 const subHeadersRow = data[1]; 
                 const alumnosData = data.slice(2);
 
-                // Buscador de columnas robusto
-                const getCol = (name) => subHeadersRow.findIndex(c => 
-                    c && c.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(name.toLowerCase())
+                // Función mejorada para encontrar columnas (limpia espacios y acentos)
+                const getColIdx = (name) => subHeadersRow.findIndex(c => 
+                    c && c.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().includes(name.toLowerCase())
                 );
 
-                const colMat = getCol('matricula');
+                const colMatricula = getColIdx('matricula');
                 
-                // Buscamos la fila del alumno
-                const filaAlumno = alumnosData.find(row => row[colMat] && row[colMat].toString().trim().toUpperCase() === matricula.toUpperCase());
+                // Si no existe columna matricula en esta hoja, saltar
+                if (colMatricula === -1) continue;
+
+                // Buscamos al alumno comparando sin espacios
+                const filaAlumno = alumnosData.find(row => {
+                    const val = row[colMatricula] ? row[colMatricula].toString().trim().toUpperCase() : "";
+                    return val === matriculaInput;
+                });
                 
                 if (filaAlumno) {
                     alumnoEncontrado = {
-                        Nombre: filaAlumno[getCol('nombre')] || '---',
-                        Matricula: filaAlumno[colMat],
-                        Grado: filaAlumno[getCol('grado')] || '',
-                        Grupo: filaAlumno[getCol('grupo')] || '',
-                        Ciclo: filaAlumno[getCol('ciclo')] || '2026-2027',
-                        PromedioFinalCiclo: filaAlumno[getCol('promedio final')] || '0.0',
+                        Nombre: filaAlumno[getColIdx('nombre')] || '---',
+                        Matricula: filaAlumno[colMatricula],
+                        Grado: filaAlumno[getColIdx('grado')] || '',
+                        Grupo: filaAlumno[getColIdx('grupo')] || '',
+                        Ciclo: filaAlumno[getColIdx('ciclo')] || '2026-2027',
+                        PromedioFinalCiclo: filaAlumno[getColIdx('promedio final')] || '0.0',
                         Materias: []
                     };
 
                     const esPrepa = (nivel === 'Preparatoria');
-                    // Identificamos dónde terminan los datos personales y empiezan las notas (T1 o S1)
                     const inicioNotas = subHeadersRow.findIndex(c => c === 'T1' || c === 'S1');
 
                     if (inicioNotas !== -1) {
                         for(let i = inicioNotas; i < materiasRow.length; i++) {
                             let mNombre = materiasRow[i] ? materiasRow[i].trim() : "";
                             
-                            // Si hay nombre de materia y no es el promedio final
                             if(mNombre !== "" && !mNombre.toUpperCase().includes('PROMEDIO FINAL')) {
                                 alumnoEncontrado.Materias.push({
                                     nombre: mNombre,
@@ -244,7 +251,7 @@
                                     n3: esPrepa ? null : (filaAlumno[i+2] || '-'),
                                     nf: esPrepa ? (filaAlumno[i+2] || '-') : (filaAlumno[i+3] || '-')
                                 });
-                                i += (esPrepa ? 2 : 3); // Saltar columnas de la materia actual
+                                i += (esPrepa ? 2 : 3);
                             }
                         }
                     }
@@ -253,15 +260,15 @@
                     break; 
                 }
             } catch (e) {
-                console.error("Error cargando nivel " + nivel);
+                console.error("Error en pestaña " + nivel, e);
             }
         }
 
         if (alumnoEncontrado) {
-            status.innerHTML = "<span class='text-success'>¡Alumno encontrado! Cargando boleta...</span>";
+            status.innerHTML = "<span class='text-success'>¡Registro encontrado con éxito!</span>";
             renderBoleta(alumnoEncontrado, nivelEncontrado);
         } else {
-            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Verifique que los datos en el Excel sean correctos.</span>";
+            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada en ninguna sección.</span>";
             document.getElementById('reportCard').style.display = 'none';
         }
     }
@@ -273,37 +280,30 @@
         document.getElementById('displayGradoGrupo').innerText = `${alumno.Grado} ${alumno.Grupo}`;
         document.getElementById('displayNivel').innerText = `Boleta Oficial - Nivel ${nivel}`;
         
-        // Ajustar el Ciclo en la parte superior derecha
-        const cicloContenedor = document.querySelector('.report-header .col-4 p');
-        if (cicloContenedor) cicloContenedor.innerHTML = `<strong>Ciclo:</strong> ${alumno.Ciclo}`;
+        const cicloCont = document.querySelector('.report-header .col-4 p');
+        if (cicloCont) cicloCont.innerHTML = `<strong>Ciclo:</strong> ${alumno.Ciclo}`;
 
         const esPrepa = (nivel === 'Preparatoria');
-        
-        // Configurar encabezados de tabla
-        let htmlHead = `<tr><th style="text-align:left; width:40%;">Materia / Asignatura</th>`;
-        htmlHead += esPrepa ? `<th>S1</th><th>S2</th>` : `<th>T1</th><th>T2</th><th>T3</th>`;
-        htmlHead += `<th>Final</th></tr>`;
-        document.getElementById('tableHeader').innerHTML = htmlHead;
+        let hHead = `<tr><th style="text-align:left; width:40%;">Materia / Asignatura</th>`;
+        hHead += esPrepa ? `<th>S1</th><th>S2</th>` : `<th>T1</th><th>T2</th><th>T3</th>`;
+        hHead += `<th>Final</th></tr>`;
+        document.getElementById('tableHeader').innerHTML = hHead;
 
-        // Configurar filas
-        let htmlBody = "";
+        let hBody = "";
         alumno.Materias.forEach(m => {
-            htmlBody += `<tr><td style="text-align:left; font-weight:600;">${m.nombre}</td>`;
-            htmlBody += `<td>${m.n1}</td><td>${m.n2}</td>`;
-            if (!esPrepa) htmlBody += `<td>${m.n3}</td>`;
-            htmlBody += `<td style="font-weight:bold; background:#f9f9f9; color:#193E9A;">${m.nf}</td></tr>`;
+            hBody += `<tr><td style="text-align:left; font-weight:600;">${m.nombre}</td>`;
+            hBody += `<td>${m.n1}</td><td>${m.n2}</td>`;
+            if (!esPrepa) hBody += `<td>${m.n3}</td>`;
+            hBody += `<td style="font-weight:bold; background:#f9f9f9; color:#193E9A;">${m.nf}</td></tr>`;
         });
 
-        document.getElementById('gradeRows').innerHTML = htmlBody;
+        document.getElementById('gradeRows').innerHTML = hBody;
         document.getElementById('displayPromedio').innerText = alumno.PromedioFinalCiclo;
-        
-        // Ajustar el colspan del promedio final al fondo
         document.getElementById('promedioLabel').colSpan = esPrepa ? 3 : 4;
 
-        // Scroll suave hacia la boleta
         setTimeout(() => {
             document.getElementById('reportCard').scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+        }, 150);
     }
 </script>
 </body>
