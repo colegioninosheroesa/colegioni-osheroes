@@ -192,7 +192,7 @@
             return;
         }
 
-        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando datos...";
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando datos en el sistema...";
         let alumnoEncontrado = null;
         let nivelEncontrado = "";
 
@@ -206,66 +206,61 @@
                 
                 if (data.length < 3) continue;
 
-                const materiasRow = data[0]; // Fila 1: Materias
-                const subHeadersRow = data[1]; // Fila 2: Encabezados (Matricula, Nombre, S1...)
-                const registros = data.slice(2); // Alumnos (Fila 3 en adelante)
+                const filaMaterias = data[0]; // Fila 1: Nombres de materias (ESPAÑOL, etc) 
+                const filaEncabezados = data[1]; // Fila 2: Matricula, Nombre, Ciclo, etc 
+                const registros = data.slice(2); // Alumnos
 
-                const filaAlumno = registros.find(row => {
-                    if (!row[0]) return false;
-                    const matExcel = row[0].toString().replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
-                    return matExcel === matriculaInput;
-                });
+                // Normalización para evitar errores por espacios o tildes
+                const limpiar = (t) => t ? t.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() : "";
+
+                // Buscamos la fila del alumno comparando la matrícula en la columna 0 (A)
+                const filaAlumno = registros.find(row => row[0] && row[0].toString().trim() === matriculaInput);
                 
                 if (filaAlumno) {
-                    // Función para limpiar y normalizar texto de búsqueda de columnas
-                    const normalizar = (t) => t.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                    // Buscador dinámico de columnas por nombre en la Fila 2
+                    const findCol = (name) => filaEncabezados.findIndex(c => limpiar(c) === limpiar(name));
 
-                    const getCol = (name) => subHeadersRow.findIndex(c => 
-                        c && normalizar(c).includes(normalizar(name))
-                    );
-
-                    // Extraer datos personales y promedio [cite: 3, 4, 5]
                     alumnoEncontrado = {
-                        Nombre: filaAlumno[getCol('Nombre')] || filaAlumno[1] || '---',
+                        Nombre: filaAlumno[findCol('Nombre')] || '---', // Busca la columna "Nombre" 
                         Matricula: filaAlumno[0], 
-                        Grado: filaAlumno[getCol('Grado')] || '---',
-                        Grupo: filaAlumno[getCol('Grupo')] || '---',
-                        Ciclo: filaAlumno[getCol('Ciclo')] || '2025-2026',
-                        PromedioFinalCiclo: filaAlumno[getCol('Promedio Final')] || '---',
+                        Grado: filaAlumno[findCol('Grado')] || '---', // Busca la columna "Grado" [cite: 4]
+                        Grupo: filaAlumno[findCol('Grupo')] || '---', // Busca la columna "Grupo" [cite: 4]
+                        Ciclo: filaAlumno[findCol('Ciclo')] || '2025-2026',
+                        PromedioFinalCiclo: filaAlumno[findCol('Promedio Final')] || '0.0', // Busca "Promedio Final" 
                         Materias: []
                     };
 
                     const esPrepa = (nivel === 'Preparatoria');
-                    const inicioColumnasMaterias = 5; // Empieza en columna F
+                    // Las materias comienzan después de la columna "Grupo" (usualmente índice 5 / Columna F) [cite: 11]
+                    const colInicio = findCol('Grupo') + 1;
 
-                    for (let i = inicioColumnasMaterias; i < materiasRow.length; i++) {
-                        let mNombre = materiasRow[i] ? materiasRow[i].trim() : "";
+                    for (let i = colInicio; i < filaMaterias.length; i++) {
+                        let mNombre = filaMaterias[i] ? filaMaterias[i].trim() : "";
                         
-                        // Si encontramos un nombre de materia en la Fila 1
-                        if (mNombre !== "" && !normalizar(mNombre).includes('promedio final')) {
+                        // Si hay un nombre en la Fila 1 y no es el promedio final general
+                        if (mNombre !== "" && !limpiar(mNombre).includes('promedio final')) {
                             alumnoEncontrado.Materias.push({
-                                nombre: mNombre, // Solo el nombre de la Fila 1, sin el "S1" o "T1" 
+                                nombre: mNombre, // Toma el nombre limpio de la Fila 1 
                                 n1: filaAlumno[i] || '-',
                                 n2: filaAlumno[i+1] || '-',
                                 n3: esPrepa ? null : (filaAlumno[i+2] || '-'),
                                 nf: esPrepa ? (filaAlumno[i+2] || '-') : (filaAlumno[i+3] || '-')
                             });
+                            // Salta el bloque según el nivel (3 columnas prepa, 4 básicas) 
                             i += (esPrepa ? 2 : 3);
                         }
                     }
                     nivelEncontrado = nivel;
                     break; 
                 }
-            } catch (e) {
-                console.error("Error en " + nivel, e);
-            }
+            } catch (e) { console.error("Error en nivel " + nivel, e); }
         }
 
         if (alumnoEncontrado) {
-            status.innerHTML = "<span class='text-success'>¡Registro encontrado!</span>";
+            status.innerHTML = "<span class='text-success'>¡Datos recuperados!</span>";
             renderBoleta(alumnoEncontrado, nivelEncontrado);
         } else {
-            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada.</span>";
+            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Verifique que el Excel esté publicado.</span>";
             document.getElementById('reportCard').style.display = 'none';
         }
     }
@@ -280,6 +275,7 @@
 
         const esPrepa = (nivel === 'Preparatoria');
         
+        // Encabezados con nombres correctos (Semestre o Trimestre)
         let hHead = `<tr><th style="text-align:left; width:40%;">Materia / Asignatura</th>`;
         if (esPrepa) {
             hHead += `<th>Semestre 1</th><th>Semestre 2</th>`;
