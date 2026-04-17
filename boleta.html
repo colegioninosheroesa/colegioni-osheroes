@@ -184,7 +184,7 @@
 
     async function buscarBoleta() {
         const inputRaw = document.getElementById('matriculaInput').value;
-        const matriculaInput = inputRaw.trim(); 
+        const matriculaInput = inputRaw.trim().toUpperCase(); // Normalizamos a mayúsculas
         const status = document.getElementById('statusMsg');
         
         if (!matriculaInput) {
@@ -192,12 +192,15 @@
             return;
         }
 
-        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando datos...";
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando en los registros del colegio...";
         let alumnoEncontrado = null;
         let nivelEncontrado = "";
 
+        // Función para limpiar texto de basura técnica del Excel
+        const limpiarDato = (t) => t ? t.toString().trim().toUpperCase().replace(/[\u200B-\u200D\uFEFF]/g, "") : "";
+
         for (let nivel of niveles) {
-            const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nivel)}&tqx=cb:${Date.now()}`;
+            const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nivel)}&tqx=cb=${Date.now()}`;
             
             try {
                 const res = await fetch(url);
@@ -206,22 +209,21 @@
                 
                 if (data.length < 2) continue;
 
-                // Identificamos las filas (Fila 1 es índice 0, Fila 2 es índice 1)
-                const filaMateriasNombres = data[0]; 
-                const filaEncabezados = data[1]; 
-                const registros = data.slice(2);
+                const filaMateriasNombres = data[0]; // Fila 1 
+                const registros = data.slice(2); // Alumnos (Fila 3 en adelante)
 
-                // Buscar alumno por matrícula en la Columna A (índice 0)
-                const filaAlumno = registros.find(row => row[0] && row[0].toString().trim() === matriculaInput);
+                // Buscamos en la Columna A (índice 0) 
+                const filaAlumno = registros.find(row => limpiarDato(row[0]) === matriculaInput);
 
                 if (filaAlumno) {
                     const esPrepa = (nivel === 'Preparatoria');
-                    const salto = esPrepa ? 3 : 4; // 3 columnas para Prepa, 4 para los demás
+                    const salto = esPrepa ? 3 : 4; // 
 
-                    // Función para formatear a 1 decimal
+                    // Función para formatear números a 1 solo decimal 
                     const fmt = (val) => {
                         if (!val || val === '-' || isNaN(val)) return val || '-';
-                        return parseFloat(val).toFixed(1);
+                        let num = parseFloat(val);
+                        return num.toFixed(1);
                     };
 
                     alumnoEncontrado = {
@@ -233,11 +235,10 @@
                         Materias: []
                     };
 
-                    // EXTRACCIÓN DE MATERIAS (Inicia en columna F / índice 5)
+                    // Extraer materias desde columna F (índice 5) 
                     for (let i = 5; i < filaMateriasNombres.length; i += salto) {
                         let nombreMateria = filaMateriasNombres[i] ? filaMateriasNombres[i].trim() : "";
                         
-                        // Si la celda tiene nombre y no es el promedio final
                         if (nombreMateria !== "" && !nombreMateria.toLowerCase().includes('promedio')) {
                             alumnoEncontrado.Materias.push({
                                 nombre: nombreMateria,
@@ -249,9 +250,9 @@
                         }
                     }
 
-                    // Promedio Final (última columna con datos numéricos)
-                    let valorPromedio = filaAlumno[filaAlumno.length - 1];
-                    alumnoEncontrado.PromedioFinalCiclo = fmt(valorPromedio);
+                    // Promedio final: tomamos el último dato de la fila y le damos formato de 1 decimal 
+                    let ultimoDato = filaAlumno[filaAlumno.length - 1];
+                    alumnoEncontrado.PromedioFinalCiclo = fmt(ultimoDato);
 
                     nivelEncontrado = nivel;
                     break; 
@@ -263,7 +264,7 @@
             status.innerHTML = "<span class='text-success'>¡Registro encontrado!</span>";
             renderBoleta(alumnoEncontrado, nivelEncontrado);
         } else {
-            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada.</span>";
+            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Verifique que esté en el Excel.</span>";
             document.getElementById('reportCard').style.display = 'none';
         }
     }
@@ -290,9 +291,12 @@
             hBody += `<td style="font-weight:bold; background:#f9f9f9; color:#193E9A;">${m.nf}</td></tr>`;
         });
 
-        document.getElementById('gradeRows').innerHTML = hBody || "<tr><td colspan='5'>Error al cargar materias.</td></tr>";
+        document.getElementById('gradeRows').innerHTML = hBody;
         document.getElementById('displayPromedio').innerText = alumno.PromedioFinalCiclo;
         document.getElementById('promedioLabel').colSpan = esPrepa ? 3 : 4;
+        
+        // Scroll suave hacia la boleta
+        setTimeout(() => document.getElementById('reportCard').scrollIntoView({ behavior: 'smooth' }), 100);
     }
 </script>
 </body>
