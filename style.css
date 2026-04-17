@@ -3,7 +3,7 @@
 :root {
     --azul-id: #193E9A;    
     --verde-id: #317F77;   
-    --whatsapp: #2cb742; /* Verde más vibrante como la imagen */
+    --whatsapp: #2cb742; 
     --blanco: #ffffff;
     --fondo: #f8fafc;      
     --texto: #334155;      
@@ -40,7 +40,7 @@ h1, h2, h3, h4, h5, .navbar-brand, .nav-link {
 .top-bar a { color: white; text-decoration: none; }
 
 /* =========================================
-   NAVEGACIÓN (ESTILO BADEN POWELL)
+   NAVEGACIÓN
    ========================================= */
 .navbar { 
     background: var(--blanco) !important;
@@ -58,7 +58,6 @@ h1, h2, h3, h4, h5, .navbar-brand, .nav-link {
     padding-right: 40px;
 }
 
-/* LOGO Y TEXTO */
 .navbar-brand {
     color: var(--azul-id) !important;
     font-size: 1.8rem; 
@@ -75,18 +74,17 @@ h1, h2, h3, h4, h5, .navbar-brand, .nav-link {
     margin-right: 15px; 
 }
 
-/* CONTENEDOR CENTRAL DE ENLACES */
 .navbar-collapse {
     flex-grow: 1; 
     display: flex !important;
-    justify-content: center; /* Centra el bloque de links en el vacío */
+    justify-content: center; 
 }
 
 .navbar-nav {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly; /* DISTRIBUYE LOS LINKS */
-    width: 80%; /* Controla qué tan esparcidos están */
+    justify-content: space-evenly; 
+    width: 80%; 
     align-items: center;
     margin: 0 auto;
 }
@@ -95,7 +93,7 @@ h1, h2, h3, h4, h5, .navbar-brand, .nav-link {
     color: var(--texto) !important; 
     font-size: 0.95rem; 
     font-weight: 600;
-    text-transform: none; /* Letra normal como la imagen */
+    text-transform: none; 
     transition: 0.3s;
     white-space: nowrap;
     padding: 0 10px !important;
@@ -103,7 +101,6 @@ h1, h2, h3, h4, h5, .navbar-brand, .nav-link {
 
 .nav-link:hover { color: var(--verde-id) !important; }
 
-/* BOTÓN WHATSAPP */
 .btn-whatsapp-nav { 
     background: var(--whatsapp); 
     color: white !important; 
@@ -118,39 +115,78 @@ h1, h2, h3, h4, h5, .navbar-brand, .nav-link {
 }
 
 /* =========================================
-   HERO Y SECCIONES (AJUSTADO MÁS DELGADO)
+   HERO
    ========================================= */
 .hero {
     background: linear-gradient(135deg, rgba(25, 62, 154, 0.85), rgba(49, 127, 119, 0.8)), 
                 url('https://images.unsplash.com/photo-1523050853063-915894614232?w=1400') center/cover;
-    height: 150px; /* Reducido de 35vh a 150px para que sea una franja delgada */
+    height: 150px; 
     display: flex; 
     align-items: center; 
-    justify-content: center; /* Centra el texto horizontalmente */
+    justify-content: center; 
     color: white; 
     text-align: center; 
-    border-radius: 0 0 30px 30px; /* Curvatura ligeramente más suave */
+    border-radius: 0 0 30px 30px; 
 }
 
-/* Ajuste opcional para el tamaño del h1 dentro del hero */
 .hero h1 {
-    font-size: 2rem; /* Tamaño de letra más adecuado para una franja delgada */
+    font-size: 2rem; 
     margin: 0;
     font-weight: 700;
 }
 
 section { padding: 80px 0; }
 
-.card-moderna {
-    border: none; 
-    border-radius: 25px; 
-    background: white; 
+/* =========================================
+   TARJETAS Y CORRECCIÓN DE IMÁGENES (NUEVO)
+   ========================================= */
+.card-extra {
+    border: none;
+    border-radius: 25px !important;
+    background: white;
     transition: 0.4s;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
-    overflow: hidden; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    overflow: hidden;
     margin-bottom: 30px;
+    height: 100% !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px !important;
 }
 
+.card-extra img {
+    width: 100%;
+    height: 180px;      /* Altura fija para todas */
+    object-fit: cover;  /* Recorte inteligente para que no se estiren */
+    object-position: center;
+    border-radius: 15px;
+    margin-bottom: 15px;
+}
+
+/* Estilo para los iconos si no hay imagen */
+.card-extra i {
+    font-size: 3rem;
+    color: var(--verde-id);
+    margin-bottom: 15px;
+}
+
+.card-extra:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(25, 62, 154, 0.15);
+}
+
+.card-extra h6 {
+    color: var(--azul-id);
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin: 0;
+    text-align: center;
+}
+
+/* =========================================
+   FORMULARIOS Y OTROS
+   ========================================= */
 .form-container { 
     background: white; 
     padding: 50px; 
