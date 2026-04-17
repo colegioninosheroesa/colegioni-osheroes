@@ -180,7 +180,13 @@
 
 <script>
     const sheetID = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6m0pTs'; 
-    const niveles = ['Kinder', 'Primaria', 'Secundaria', 'Preparatoria'];
+    // Lista extendida de todos tus niveles/grados
+    const niveles = [
+        'Kinder 1', 'Kinder 2', 'Kinder 3', 
+        'Primaria 1', 'Primaria 2', 'Primaria 3', 'Primaria 4', 'Primaria 5', 'Primaria 6',
+        'Secundaria 1', 'Secundaria 2', 'Secundaria 3',
+        'Preparatoria 1', 'Preparatoria 2', 'Preparatoria 3'
+    ];
 
     async function buscarBoleta() {
         const inputRaw = document.getElementById('matriculaInput').value;
@@ -192,15 +198,18 @@
             return;
         }
 
-        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando datos...";
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando en los registros escolares...";
         let alumnoEncontrado = null;
         let nivelEncontrado = "";
 
+        // RECORRIDO DE TODAS LAS PESTAÑAS DE GRADOS
         for (let nivel of niveles) {
             const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nivel)}&tqx=cb:${Date.now()}`;
             
             try {
                 const res = await fetch(url);
+                if (!res.ok) continue; // Si la pestaña no existe aún, se la salta
+
                 const csvText = await res.text();
                 const data = Papa.parse(csvText, { header: false, skipEmptyLines: true }).data;
                 
@@ -211,15 +220,18 @@
                 const registros = data.slice(2);
 
                 const limpiar = (t) => t ? t.toString().trim().toUpperCase() : "";
+                
+                // Buscar matrícula en la Columna A
                 const filaAlumno = registros.find(row => limpiar(row[0]) === matriculaInput);
 
                 if (filaAlumno) {
-                    const esPrepa = (nivel === 'Preparatoria');
+                    // Determinar si es preparatoria para el formato de 3 o 4 columnas
+                    const esPrepa = nivel.toLowerCase().includes('preparatoria');
                     const saltoMateria = esPrepa ? 3 : 4;
 
-                    // Formato: 1 decimal sin redondear agresivamente
                     const fmt = (val) => {
                         if (!val || val === '-' || isNaN(val)) return val || '-';
+                        // Truncar a 1 decimal para que 7.6 sea 7.6 y no 7.7
                         return (Math.floor(parseFloat(val) * 10) / 10).toFixed(1);
                     };
 
@@ -232,10 +244,10 @@
                         Materias: []
                     };
 
-                    // EXTRACCIÓN MEJORADA DE MATERIAS
+                    // EXTRAER MATERIAS (Desde Columna F / Índice 5)
                     for (let i = 5; i < filaEncabezados.length; i += saltoMateria) {
-                        // Si la celda actual está vacía (por ser celda combinada), busca hacia atrás
                         let nombreMateria = "";
+                        // Lógica para celdas combinadas: buscar nombre hacia la izquierda en fila 1
                         for (let j = i; j >= 5; j--) {
                             if (filaMateriasRaw[j] && filaMateriasRaw[j].trim() !== "") {
                                 nombreMateria = filaMateriasRaw[j].trim();
@@ -254,19 +266,19 @@
                         }
                     }
 
-                    let valorPromedio = filaAlumno[filaAlumno.length - 1];
-                    alumnoEncontrado.PromedioFinalCiclo = fmt(valorPromedio);
+                    // Promedio Final: Último dato de la fila
+                    alumnoEncontrado.PromedioFinalCiclo = fmt(filaAlumno[filaAlumno.length - 1]);
                     nivelEncontrado = nivel;
                     break; 
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Error buscando en: " + nivel); }
         }
 
         if (alumnoEncontrado) {
             status.innerHTML = "<span class='text-success'>¡Registro encontrado!</span>";
             renderBoleta(alumnoEncontrado, nivelEncontrado);
         } else {
-            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada.</span>";
+            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Verifique el grado y el Excel.</span>";
             document.getElementById('reportCard').style.display = 'none';
         }
     }
@@ -276,19 +288,17 @@
         document.getElementById('displayName').innerText = alumno.Nombre;
         document.getElementById('displayMatricula').innerText = alumno.Matricula;
         document.getElementById('displayGradoGrupo').innerText = `${alumno.Grado} ${alumno.Grupo}`;
-        document.getElementById('displayNivel').innerText = `Boleta Oficial - Nivel ${nivel}`;
+        document.getElementById('displayNivel').innerText = `Boleta Oficial - ${nivel}`;
         document.getElementById('displayCiclo').innerHTML = `<strong>Ciclo:</strong> ${alumno.Ciclo}`;
 
-        const esPrepa = (nivel === 'Preparatoria');
+        const esPrepa = nivel.toLowerCase().includes('preparatoria');
         let hHead = `<tr><th style="text-align:left; width:40%;">Materia / Asignatura</th>`;
         
-        // Cambiado a nombres largos
         if (esPrepa) {
             hHead += `<th>Semestre 1</th><th>Semestre 2</th>`;
         } else {
             hHead += `<th>Trimestre 1</th><th>Trimestre 2</th><th>Trimestre 3</th>`;
         }
-        
         hHead += `<th>Final</th></tr>`;
         document.getElementById('tableHeader').innerHTML = hHead;
 
