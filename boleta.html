@@ -192,7 +192,7 @@
             return;
         }
 
-        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando en todos los niveles...";
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando información...";
         let alumnoEncontrado = null;
         let nivelEncontrado = "";
 
@@ -206,76 +206,61 @@
                 
                 if (data.length < 2) continue;
 
-                // 1. Localizar la fila de encabezados (donde está "Matricula")
+                // Localizamos la fila 2 (donde está "Matricula")
                 let idxCabecera = data.findIndex(row => 
                     row.some(cell => cell && cell.toString().toLowerCase().includes("matricula"))
                 );
 
                 if (idxCabecera === -1) continue;
 
-                const filaMateriasNombres = data[idxCabecera - 1] || []; 
-                const filaSubEncabezados = data[idxCabecera];
+                const filaMateriasNombres = data[idxCabecera - 1] || []; // Fila 1
+                const filaEncabezados = data[idxCabecera]; // Fila 2
                 const registros = data.slice(idxCabecera + 1);
 
                 const limpiar = (t) => t ? t.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() : "";
 
-                // 2. Buscar al alumno
-                const colMat = filaSubEncabezados.findIndex(c => limpiar(c).includes("matricula"));
-                const filaAlumno = registros.find(row => 
-                    row[colMat] && row[colMat].toString().trim() === matriculaInput
-                );
+                // Buscar al alumno en la columna A
+                const filaAlumno = registros.find(row => row[0] && row[0].toString().trim() === matriculaInput);
 
                 if (filaAlumno) {
-                    const findCol = (name) => filaSubEncabezados.findIndex(c => limpiar(c).includes(limpiar(name)));
+                    const findCol = (name) => filaEncabezados.findIndex(c => limpiar(c).includes(limpiar(name)));
 
                     alumnoEncontrado = {
-                        Nombre: filaAlumno[findCol('Nombre')] || '---',
-                        Matricula: filaAlumno[colMat],
+                        Nombre: filaAlumno[1] || '---',
+                        Matricula: filaAlumno[0],
                         Grado: filaAlumno[findCol('Grado')] || '---',
                         Grupo: filaAlumno[findCol('Grupo')] || '---',
                         Ciclo: filaAlumno[findCol('Ciclo')] || '2025-2026',
-                        PromedioFinalCiclo: '0.0', // Se calculará o buscará al final
                         Materias: []
                     };
 
                     const esPrepa = (nivel === 'Preparatoria');
+                    const salto = esPrepa ? 3 : 4; // Preparatoria 3 columnas, otros 4.
                     
-                    // 3. IDENTIFICACIÓN DINÁMICA DE MATERIAS
-                    // Buscamos la primera columna que sea "T1" o "S1" para empezar
-                    let colInicioMaterias = filaSubEncabezados.findIndex(c => limpiar(c) === 't1' || limpiar(c) === 's1');
-
-                    if (colInicioMaterias !== -1) {
-                        for (let i = colInicioMaterias; i < filaSubEncabezados.length; i++) {
-                            let nombreMateria = filaMateriasNombres[i] ? filaMateriasNombres[i].trim() : "";
-                            
-                            // Si encontramos un nombre de materia en la fila superior
-                            if (nombreMateria !== "" && !limpiar(nombreMateria).includes('promedio final')) {
-                                alumnoEncontrado.Materias.push({
-                                    nombre: nombreMateria,
-                                    n1: filaAlumno[i] || '-',
-                                    n2: filaAlumno[i+1] || '-',
-                                    n3: esPrepa ? null : (filaAlumno[i+2] || '-'),
-                                    nf: esPrepa ? (filaAlumno[i+2] || '-') : (filaAlumno[i+3] || '-')
-                                });
-                                // Saltar columnas según el nivel (S1, S2, PF = 3 cols | T1, T2, T3, PF = 4 cols)
-                                i += (esPrepa ? 2 : 3);
-                            }
+                    // EMPEZAR ESTRICTAMENTE EN COLUMNA F (Índice 5)
+                    for (let i = 5; i < filaMateriasNombres.length; i += salto) {
+                        let nombreMateria = filaMateriasNombres[i] ? filaMateriasNombres[i].trim() : "";
+                        
+                        if (nombreMateria !== "" && !limpiar(nombreMateria).includes('promedio')) {
+                            alumnoEncontrado.Materias.push({
+                                nombre: nombreMateria,
+                                n1: filaAlumno[i] || '-',
+                                n2: filaAlumno[i+1] || '-',
+                                n3: esPrepa ? null : (filaAlumno[i+2] || '-'),
+                                nf: esPrepa ? (filaAlumno[i+2] || '-') : (filaAlumno[i+3] || '-')
+                            });
                         }
                     }
 
-                    // 4. Buscar el promedio final (buscando la columna que diga "Promedio Final")
-                    let colPromedio = filaSubEncabezados.findIndex(c => limpiar(c).includes('promedio final'));
-                    if (colPromedio !== -1) {
-                        alumnoEncontrado.PromedioFinalCiclo = filaAlumno[colPromedio] || '0.0';
-                    } else {
-                        // Si no existe la columna con ese nombre, intentamos con la última columna con datos
-                        alumnoEncontrado.PromedioFinalCiclo = filaAlumno[filaAlumno.length - 1] || '0.0';
-                    }
+                    // El promedio final suele estar después de todas las materias
+                    // Buscamos la columna que diga "Promedio Final" o similar
+                    let colPromedio = filaEncabezados.findIndex(c => limpiar(c).includes('promedio') || limpiar(c).includes('final del ciclo'));
+                    alumnoEncontrado.PromedioFinalCiclo = colPromedio !== -1 ? filaAlumno[colPromedio] : filaAlumno[filaAlumno.length - 1];
 
                     nivelEncontrado = nivel;
                     break; 
                 }
-            } catch (e) { console.error("Error en nivel " + nivel, e); }
+            } catch (e) { console.error(e); }
         }
 
         if (alumnoEncontrado) {
@@ -296,7 +281,6 @@
         document.getElementById('displayCiclo').innerHTML = `<strong>Ciclo:</strong> ${alumno.Ciclo}`;
 
         const esPrepa = (nivel === 'Preparatoria');
-        
         let hHead = `<tr><th style="text-align:left; width:40%;">Materia / Asignatura</th>`;
         hHead += esPrepa ? `<th>S1</th><th>S2</th>` : `<th>T1</th><th>T2</th><th>T3</th>`;
         hHead += `<th>Final</th></tr>`;
@@ -310,15 +294,9 @@
             hBody += `<td style="font-weight:bold; background:#f9f9f9; color:#193E9A;">${m.nf}</td></tr>`;
         });
 
-        if (alumno.Materias.length === 0) {
-            hBody = "<tr><td colspan='5' class='text-center'>No se encontraron materias registradas.</td></tr>";
-        }
-
-        document.getElementById('gradeRows').innerHTML = hBody;
+        document.getElementById('gradeRows').innerHTML = hBody || "<tr><td colspan='5'>No hay materias.</td></tr>";
         document.getElementById('displayPromedio').innerText = alumno.PromedioFinalCiclo;
         document.getElementById('promedioLabel').colSpan = esPrepa ? 3 : 4;
-        
-        setTimeout(() => document.getElementById('reportCard').scrollIntoView({ behavior: 'smooth' }), 100);
     }
 </script>
 </body>
