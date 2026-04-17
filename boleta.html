@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
+        :root { --azul-id: #193E9A; --verde-id: #2D8B7D; }
         .btn-volver {
             border: 2px solid var(--azul-id);
             color: var(--azul-id);
@@ -117,11 +118,12 @@
             <div class="report-header">
                 <div class="row align-items-center">
                     <div class="col-8">
+                        <img src="Iconos/logo.png" alt="Logo Colegio" style="max-height: 70px; margin-bottom: 10px;">
                         <h2 style="color: var(--azul-id); font-weight: 900; margin: 0;">Colegio Niños Héroes</h2>
                         <p class="text-muted m-0" id="displayNivel">Reporte oficial de progreso académico</p>
                     </div>
                     <div class="col-4 text-right">
-                        <p class="m-0"><strong>Ciclo:</strong> 2026-2027</p>
+                        <p class="m-0" id="displayCiclo"><strong>Ciclo:</strong> ---</p>
                     </div>
                 </div>
             </div>
@@ -190,7 +192,7 @@
             return;
         }
 
-        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Conectando...";
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando datos...";
         let alumnoEncontrado = null;
         let nivelEncontrado = "";
 
@@ -202,24 +204,19 @@
                 const csvText = await res.text();
                 const data = Papa.parse(csvText, { header: false, skipEmptyLines: true }).data;
                 
-                if (data.length < 2) continue;
+                if (data.length < 3) continue;
 
-                // Definimos las filas base
-                const materiasRow = data[0]; 
-                const subHeadersRow = data[1]; 
-                // IMPORTANTE: Ahora incluimos desde la fila 2 en adelante para no saltarnos al primer alumno
-                const todosLosRegistros = data.slice(1); 
+                const materiasRow = data[0]; // Fila 1 (Materias combinadas)
+                const subHeadersRow = data[1]; // Fila 2 (Matricula, Nombre, T1, T2...)
+                const registros = data.slice(1); // Incluimos desde fila 2 para no perder al primero
 
-                // Buscamos en la Columna A (índice 0)
-                const filaAlumno = todosLosRegistros.find(row => {
+                const filaAlumno = registros.find(row => {
                     if (!row[0]) return false;
                     const matExcel = row[0].toString().replace(/[\u200B-\u200D\uFEFF]/g, "").trim();
                     return matExcel === matriculaInput;
                 });
                 
                 if (filaAlumno) {
-                    console.log(`¡Localizado! Nivel: ${nivel}, Alumno: ${filaAlumno[1]}`);
-
                     const getCol = (name) => subHeadersRow.findIndex(c => 
                         c && c.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().includes(name.toLowerCase())
                     );
@@ -235,21 +232,22 @@
                     };
 
                     const esPrepa = (nivel === 'Preparatoria');
-                    const inicioNotas = subHeadersRow.findIndex(c => c === 'T1' || c === 'S1');
+                    // Modificación 2: Lectura de materias desde Fila 1 (celdas combinadas)
+                    // Las materias suelen empezar en la columna F (indice 5)
+                    const inicioColumnasMaterias = 5; 
 
-                    if (inicioNotas !== -1) {
-                        for(let i = inicioNotas; i < materiasRow.length; i++) {
-                            let mNombre = materiasRow[i] ? materiasRow[i].trim() : "";
-                            if(mNombre !== "" && !mNombre.toUpperCase().includes('PROMEDIO FINAL')) {
-                                alumnoEncontrado.Materias.push({
-                                    nombre: mNombre,
-                                    n1: filaAlumno[i] || '-',
-                                    n2: filaAlumno[i+1] || '-',
-                                    n3: esPrepa ? null : (filaAlumno[i+2] || '-'),
-                                    nf: esPrepa ? (filaAlumno[i+2] || '-') : (filaAlumno[i+3] || '-')
-                                });
-                                i += (esPrepa ? 2 : 3);
-                            }
+                    for (let i = inicioColumnasMaterias; i < materiasRow.length; i++) {
+                        let mNombre = materiasRow[i] ? materiasRow[i].trim() : "";
+                        if (mNombre !== "" && !mNombre.toUpperCase().includes('PROMEDIO FINAL')) {
+                            alumnoEncontrado.Materias.push({
+                                nombre: mNombre,
+                                n1: filaAlumno[i] || '-',
+                                n2: filaAlumno[i+1] || '-',
+                                n3: esPrepa ? null : (filaAlumno[i+2] || '-'),
+                                nf: esPrepa ? (filaAlumno[i+2] || '-') : (filaAlumno[i+3] || '-')
+                            });
+                            // Salto de columnas: 3 para prepa (S1, S2, PF), 4 para básicos (T1, T2, T3, PF)
+                            i += (esPrepa ? 2 : 3);
                         }
                     }
                     nivelEncontrado = nivel;
@@ -264,7 +262,7 @@
             status.innerHTML = "<span class='text-success'>¡Registro encontrado!</span>";
             renderBoleta(alumnoEncontrado, nivelEncontrado);
         } else {
-            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Intente de nuevo.</span>";
+            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada.</span>";
             document.getElementById('reportCard').style.display = 'none';
         }
     }
@@ -275,13 +273,17 @@
         document.getElementById('displayMatricula').innerText = alumno.Matricula;
         document.getElementById('displayGradoGrupo').innerText = `${alumno.Grado} ${alumno.Grupo}`;
         document.getElementById('displayNivel').innerText = `Boleta Oficial - Nivel ${nivel}`;
-        
-        const cicloCont = document.querySelector('.report-header .col-4 p');
-        if (cicloCont) cicloCont.innerHTML = `<strong>Ciclo:</strong> ${alumno.Ciclo}`;
+        document.getElementById('displayCiclo').innerHTML = `<strong>Ciclo:</strong> ${alumno.Ciclo}`;
 
         const esPrepa = (nivel === 'Preparatoria');
+        
+        // Modificación: Nombres largos en encabezados
         let hHead = `<tr><th style="text-align:left; width:40%;">Materia / Asignatura</th>`;
-        hHead += esPrepa ? `<th>S1</th><th>S2</th>` : `<th>T1</th><th>T2</th><th>T3</th>`;
+        if (esPrepa) {
+            hHead += `<th>Semestre 1</th><th>Semestre 2</th>`;
+        } else {
+            hHead += `<th>Trimestre 1</th><th>Trimestre 2</th><th>Trimestre 3</th>`;
+        }
         hHead += `<th>Final</th></tr>`;
         document.getElementById('tableHeader').innerHTML = hHead;
 
@@ -296,6 +298,7 @@
         document.getElementById('gradeRows').innerHTML = hBody;
         document.getElementById('displayPromedio').innerText = alumno.PromedioFinalCiclo;
         document.getElementById('promedioLabel').colSpan = esPrepa ? 3 : 4;
+        
         setTimeout(() => document.getElementById('reportCard').scrollIntoView({ behavior: 'smooth' }), 100);
     }
 </script>
