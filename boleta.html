@@ -197,7 +197,7 @@
             return;
         }
 
-        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando datos...";
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Extrayendo información de las materias...";
         let alumnoEncontrado = null;
         let nivelEncontrado = "";
 
@@ -209,7 +209,7 @@
                 const csvText = await res.text();
                 const data = Papa.parse(csvText, { header: false, skipEmptyLines: true }).data;
                 
-                // Localizar fila de encabezados (donde dice Matricula)
+                // Localizar fila donde está la "Matricula" (usualmente fila 2)
                 let headerRowIdx = data.findIndex(row => row[0] && row[0].toString().toLowerCase().includes('matricula'));
                 if (headerRowIdx === -1) continue;
 
@@ -225,6 +225,7 @@
 
                     const fmt = (val) => {
                         if (!val || val === '-' || isNaN(val)) return null;
+                        // Formato a 1 decimal sin redondear hacia arriba (7.6)
                         return (Math.floor(parseFloat(val) * 10) / 10).toFixed(1);
                     };
 
@@ -237,57 +238,60 @@
                         Materias: []
                     };
 
-                    // BUSCAR MATERIAS: Desde Columna F (índice 5)
-                    for (let i = 5; i < filaAlumno.length; i += anchoMateria) {
+                    // PROMEDIO FINAL: Buscamos el último número de la fila antes de procesar materias
+                    let promedioFinal = "-";
+                    for (let k = filaAlumno.length - 1; k >= 5; k--) {
+                        let val = filaAlumno[k];
+                        if (val && !isNaN(val) && val.toString().trim() !== "") {
+                            promedioFinal = fmt(val);
+                            break;
+                        }
+                    }
+                    alumnoEncontrado.PromedioFinalCiclo = promedioFinal;
+
+                    // EXTRACCIÓN DE MATERIAS (Desde F = índice 5)
+                    for (let i = 5; i < filaAlumno.length - 1; i += anchoMateria) {
                         let nombreMateria = "";
-                        // Buscar el nombre en la fila superior (celdas combinadas)
+                        // Buscar el nombre en la fila de arriba (Fila 1)
                         for (let j = i; j >= 5; j--) {
                             if (filaMateriasNombres[j] && filaMateriasNombres[j].trim() !== "") {
                                 nombreMateria = filaMateriasNombres[j].trim();
                                 break;
                             }
                         }
-                        
-                        // Si el nombre dice "PROMEDIO" o está vacío, aquí terminan las materias
-                        if (!nombreMateria || nombreMateria.toUpperCase().includes('PROMEDIO')) break;
 
-                        if (esPrepa) {
-                            alumnoEncontrado.Materias.push({
-                                nombre: nombreMateria,
-                                n1: fmt(filaAlumno[i]) || '-',
-                                n2: fmt(filaAlumno[i+1]) || '-',
-                                nf: fmt(filaAlumno[i+2]) || '-'
-                            });
-                        } else {
-                            alumnoEncontrado.Materias.push({
-                                nombre: nombreMateria,
-                                n1: fmt(filaAlumno[i]) || '-',
-                                n2: fmt(filaAlumno[i+1]) || '-',
-                                n3: fmt(filaAlumno[i+2]) || '-',
-                                nf: fmt(filaAlumno[i+3]) || '-'
-                            });
+                        // Si detectamos que la columna es el promedio general, dejamos de añadir materias
+                        if (nombreMateria.toUpperCase().includes("PROMEDIO") || i >= filaAlumno.length - 1) break;
+
+                        // Solo añadimos la materia si tiene al menos una nota o un nombre
+                        if (nombreMateria) {
+                            if (esPrepa) {
+                                alumnoEncontrado.Materias.push({
+                                    nombre: nombreMateria,
+                                    n1: fmt(filaAlumno[i]) || '-',
+                                    n2: fmt(filaAlumno[i+1]) || '-',
+                                    nf: fmt(filaAlumno[i+2]) || '-'
+                                });
+                            } else {
+                                alumnoEncontrado.Materias.push({
+                                    nombre: nombreMateria,
+                                    n1: fmt(filaAlumno[i]) || '-',
+                                    n2: fmt(filaAlumno[i+1]) || '-',
+                                    n3: fmt(filaAlumno[i+2]) || '-',
+                                    nf: fmt(filaAlumno[i+3]) || '-'
+                                });
+                            }
                         }
                     }
-
-                    // BUSCAR PROMEDIO FINAL: Es el último valor numérico de la fila
-                    let ultimoPromedio = "-";
-                    for (let k = filaAlumno.length - 1; k >= 0; k--) {
-                        let val = filaAlumno[k];
-                        if (val && !isNaN(val) && val.toString().trim() !== "") {
-                            ultimoPromedio = fmt(val);
-                            break;
-                        }
-                    }
-                    alumnoEncontrado.PromedioFinalCiclo = ultimoPromedio;
 
                     nivelEncontrado = nivel;
                     break; 
                 }
-            } catch (e) { console.error("Error:", e); }
+            } catch (e) { console.error("Error procesando materias:", e); }
         }
 
         if (alumnoEncontrado) {
-            status.innerHTML = "<span class='text-success'>¡Datos cargados correctamente!</span>";
+            status.innerHTML = "<span class='text-success'>¡Boleta generada!</span>";
             renderBoleta(alumnoEncontrado, nivelEncontrado);
         } else {
             status.innerHTML = `<span class='text-danger'>Matrícula '${matriculaInput}' no encontrada.</span>`;
@@ -317,7 +321,7 @@
             hBody += `<td style="font-weight:bold; background:#f9f9f9; color:#193E9A;">${m.nf}</td></tr>`;
         });
 
-        document.getElementById('gradeRows').innerHTML = hBody;
+        document.getElementById('gradeRows').innerHTML = hBody || "<tr><td colspan='5'>No se encontraron datos de materias.</td></tr>";
         document.getElementById('displayPromedio').innerText = alumno.PromedioFinalCiclo;
         document.getElementById('promedioLabel').colSpan = esPrepa ? 3 : 4;
     }
