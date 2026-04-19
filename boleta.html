@@ -179,7 +179,7 @@
     </footer>
 
 <script>
-    const sheetID = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6p0pTs'; 
+    const sheetID = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6m0pTs'; 
     const niveles = [
         'Maternal', 'Kinder 1', 'Kinder 2', 'Kinder 3', 
         'Primaria 1', 'Primaria 2', 'Primaria 3', 'Primaria 4', 'Primaria 5', 'Primaria 6',
@@ -197,7 +197,7 @@
             return;
         }
 
-        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando materias mediante muestreo dinámico...";
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Extrayendo información de las materias...";
         let alumnoEncontrado = null;
         let nivelEncontrado = "";
 
@@ -207,87 +207,94 @@
             try {
                 const res = await fetch(url);
                 const csvText = await res.text();
-                const data = Papa.parse(csvText, { header: false, skipEmptyLines: false }).data;
+                const data = Papa.parse(csvText, { header: false, skipEmptyLines: true }).data;
                 
-                // 1. Encontrar la fila del encabezado "Matricula"
+                // Localizar fila donde está la "Matricula" (usualmente fila 2)
                 let headerRowIdx = data.findIndex(row => row[0] && row[0].toString().toLowerCase().includes('matricula'));
                 if (headerRowIdx === -1) continue;
 
-                const filaMateriasNombres = data[0]; // Usualmente la fila 1 del Excel
+                const filaMateriasNombres = data[headerRowIdx - 1] || []; 
                 const registrosAlumnos = data.slice(headerRowIdx + 1);
-                const filaAlumno = registrosAlumnos.find(row => 
-                    row[0] && row[0].toString().trim().toUpperCase() === matriculaInput
-                );
+
+                const limpiar = (t) => t ? t.toString().trim().toUpperCase().replace(/[\u200B-\u200D\uFEFF]/g, "") : "";
+                const filaAlumno = registrosAlumnos.find(row => limpiar(row[0]) === matriculaInput);
 
                 if (filaAlumno) {
                     const esPrepa = nivel.toLowerCase().includes('preparatoria');
+                    const anchoMateria = esPrepa ? 3 : 4;
+
                     const fmt = (val) => {
-                        if (!val || val === '-' || isNaN(val) || val.toString().trim() === "") return "-";
+                        if (!val || val === '-' || isNaN(val)) return null;
+                        // Formato a 1 decimal sin redondear hacia arriba (7.6)
                         return (Math.floor(parseFloat(val) * 10) / 10).toFixed(1);
                     };
 
                     alumnoEncontrado = {
-                        Nombre: filaAlumno[1], Matricula: filaAlumno[0], Ciclo: filaAlumno[2] || '2025-2026',
-                        Grado: filaAlumno[3], Grupo: filaAlumno[4], Materias: []
+                        Nombre: filaAlumno[1] || '---',
+                        Matricula: filaAlumno[0],
+                        Ciclo: filaAlumno[2] || '2025-2026',
+                        Grado: filaAlumno[3] || '---',
+                        Grupo: filaAlumno[4] || '---',
+                        Materias: []
                     };
 
-                    // 2. MUESTREO DINÁMICO: Agrupamos notas por nombre de materia
-                    let materiasTemp = {};
-                    // Empezamos en columna F (índice 5)
-                    for (let i = 5; i < filaAlumno.length; i++) {
-                        let nombreMat = "";
-                        
-                        // Buscamos el nombre de la materia hacia atrás (por si hay celdas vacías/combinadas)
+                    // PROMEDIO FINAL: Buscamos el último número de la fila antes de procesar materias
+                    let promedioFinal = "-";
+                    for (let k = filaAlumno.length - 1; k >= 5; k--) {
+                        let val = filaAlumno[k];
+                        if (val && !isNaN(val) && val.toString().trim() !== "") {
+                            promedioFinal = fmt(val);
+                            break;
+                        }
+                    }
+                    alumnoEncontrado.PromedioFinalCiclo = promedioFinal;
+
+                    // EXTRACCIÓN DE MATERIAS (Desde F = índice 5)
+                    for (let i = 5; i < filaAlumno.length - 1; i += anchoMateria) {
+                        let nombreMateria = "";
+                        // Buscar el nombre en la fila de arriba (Fila 1)
                         for (let j = i; j >= 5; j--) {
                             if (filaMateriasNombres[j] && filaMateriasNombres[j].trim() !== "") {
-                                nombreMat = filaMateriasNombres[j].trim();
+                                nombreMateria = filaMateriasNombres[j].trim();
                                 break;
                             }
                         }
 
-                        // Ignorar columnas de "Promedio General" o "Final del Ciclo"
-                        if (nombreMat && !nombreMat.toUpperCase().includes("PROMEDIO GENERAL")) {
-                            if (!materiasTemp[nombreMat]) materiasTemp[nombreMat] = [];
-                            let nota = fmt(filaAlumno[i]);
-                            if (nota !== "-") materiasTemp[nombreMat].push(nota);
-                        }
-                    }
+                        // Si detectamos que la columna es el promedio general, dejamos de añadir materias
+                        if (nombreMateria.toUpperCase().includes("PROMEDIO") || i >= filaAlumno.length - 1) break;
 
-                    // 3. Formatear para la tabla
-                    for (let nombre in materiasTemp) {
-                        let notas = materiasTemp[nombre];
-                        if (notas.length > 0) {
-                            alumnoEncontrado.Materias.push({
-                                nombre: nombre,
-                                n1: notas[0] || '-',
-                                n2: notas[1] || '-',
-                                n3: esPrepa ? null : (notas[2] || '-'),
-                                nf: esPrepa ? (notas[2] || '-') : (notas[3] || '-')
-                            });
+                        // Solo añadimos la materia si tiene al menos una nota o un nombre
+                        if (nombreMateria) {
+                            if (esPrepa) {
+                                alumnoEncontrado.Materias.push({
+                                    nombre: nombreMateria,
+                                    n1: fmt(filaAlumno[i]) || '-',
+                                    n2: fmt(filaAlumno[i+1]) || '-',
+                                    nf: fmt(filaAlumno[i+2]) || '-'
+                                });
+                            } else {
+                                alumnoEncontrado.Materias.push({
+                                    nombre: nombreMateria,
+                                    n1: fmt(filaAlumno[i]) || '-',
+                                    n2: fmt(filaAlumno[i+1]) || '-',
+                                    n3: fmt(filaAlumno[i+2]) || '-',
+                                    nf: fmt(filaAlumno[i+3]) || '-'
+                                });
+                            }
                         }
                     }
-
-                    // 4. Obtener Promedio Final (el último número de la fila)
-                    let pFinal = "-";
-                    for (let k = filaAlumno.length - 1; k >= 5; k--) {
-                        if (filaAlumno[k] && !isNaN(filaAlumno[k]) && filaAlumno[k].toString().trim() !== "") {
-                            pFinal = fmt(filaAlumno[k]);
-                            break;
-                        }
-                    }
-                    alumnoEncontrado.PromedioFinalCiclo = pFinal;
 
                     nivelEncontrado = nivel;
                     break; 
                 }
-            } catch (e) { console.error("Error en nivel " + nivel, e); }
+            } catch (e) { console.error("Error procesando materias:", e); }
         }
 
         if (alumnoEncontrado) {
             status.innerHTML = "<span class='text-success'>¡Boleta generada!</span>";
             renderBoleta(alumnoEncontrado, nivelEncontrado);
         } else {
-            status.innerHTML = `<span class='text-danger'>No se encontró la matrícula o no hay datos.</span>`;
+            status.innerHTML = `<span class='text-danger'>Matrícula '${matriculaInput}' no encontrada.</span>`;
             document.getElementById('reportCard').style.display = 'none';
         }
     }
@@ -314,7 +321,7 @@
             hBody += `<td style="font-weight:bold; background:#f9f9f9; color:#193E9A;">${m.nf}</td></tr>`;
         });
 
-        document.getElementById('gradeRows').innerHTML = hBody || "<tr><td colspan='5'>No se encontraron materias.</td></tr>";
+        document.getElementById('gradeRows').innerHTML = hBody || "<tr><td colspan='5'>No se encontraron datos de materias.</td></tr>";
         document.getElementById('displayPromedio').innerText = alumno.PromedioFinalCiclo;
         document.getElementById('promedioLabel').colSpan = esPrepa ? 3 : 4;
     }
