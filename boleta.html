@@ -181,7 +181,7 @@
 <script>
     const sheetID = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6m0pTs'; 
     
-    // Lista completa de pestañas actualizada
+    // Lista completa de todas las pestañas posibles
     const niveles = [
         'Maternal', 
         'Kinder 1', 'Kinder 2', 'Kinder 3', 
@@ -200,11 +200,12 @@
             return;
         }
 
-        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando en los registros...";
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando en los registros de " + niveles.length + " niveles...";
         let alumnoEncontrado = null;
         let nivelEncontrado = "";
 
         for (let nivel of niveles) {
+            // El timestamp al final (Date.now) obliga a Google a darte los datos más recientes del Excel
             const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nivel)}&tqx=cb:${Date.now()}`;
             
             try {
@@ -216,18 +217,20 @@
                 
                 if (data.length < 2) continue;
 
-                const filaMateriasRaw = data[0]; // Fila 1: Nombres de materias
-                const filaEncabezados = data[1]; // Fila 2: Encabezados técnicos
+                const filaMateriasRaw = data[0]; // Fila 1
+                const filaEncabezados = data[1]; // Fila 2
                 const registros = data.slice(2);
 
-                const limpiar = (t) => t ? t.toString().trim().toUpperCase() : "";
+                const limpiar = (t) => t ? t.toString().trim().toUpperCase().replace(/[\u200B-\u200D\uFEFF]/g, "") : "";
+                
+                // Buscar en la Columna A (Matrícula)
                 const filaAlumno = registros.find(row => limpiar(row[0]) === matriculaInput);
 
                 if (filaAlumno) {
                     const esPrepa = nivel.toLowerCase().includes('preparatoria');
                     const saltoMateria = esPrepa ? 3 : 4;
 
-                    // Formato de 1 decimal exacto (ej. 7.6)
+                    // Formato: 1 decimal (7.65 -> 7.6)
                     const fmt = (val) => {
                         if (!val || val === '-' || isNaN(val)) return val || '-';
                         return (Math.floor(parseFloat(val) * 10) / 10).toFixed(1);
@@ -242,10 +245,10 @@
                         Materias: []
                     };
 
-                    // Extraer materias desde columna F (índice 5)
+                    // EXTRAER MATERIAS (Desde Columna F / Índice 5)
                     for (let i = 5; i < filaEncabezados.length; i += saltoMateria) {
                         let nombreMateria = "";
-                        // Buscar el nombre en la fila 1 (manejando celdas combinadas)
+                        // Lógica para celdas combinadas: busca el nombre a la izquierda si la celda actual está vacía
                         for (let j = i; j >= 5; j--) {
                             if (filaMateriasRaw[j] && filaMateriasRaw[j].trim() !== "") {
                                 nombreMateria = filaMateriasRaw[j].trim();
@@ -264,18 +267,19 @@
                         }
                     }
 
+                    // Promedio Final: Última columna de la fila
                     alumnoEncontrado.PromedioFinalCiclo = fmt(filaAlumno[filaAlumno.length - 1]);
                     nivelEncontrado = nivel;
                     break; 
                 }
-            } catch (e) { console.error("Error en: " + nivel); }
+            } catch (e) { console.error("Error buscando en: " + nivel); }
         }
 
         if (alumnoEncontrado) {
             status.innerHTML = "<span class='text-success'>¡Registro encontrado!</span>";
             renderBoleta(alumnoEncontrado, nivelEncontrado);
         } else {
-            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Verifique los datos en el Excel.</span>";
+            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Asegúrese de que la pestaña 'Maternal' existe en el Excel.</span>";
             document.getElementById('reportCard').style.display = 'none';
         }
     }
@@ -307,7 +311,7 @@
             hBody += `<td style="font-weight:bold; background:#f9f9f9; color:#193E9A;">${m.nf}</td></tr>`;
         });
 
-        document.getElementById('gradeRows').innerHTML = hBody;
+        document.getElementById('gradeRows').innerHTML = hBody || "<tr><td colspan='5'>No se encontraron materias.</td></tr>";
         document.getElementById('displayPromedio').innerText = alumno.PromedioFinalCiclo;
         document.getElementById('promedioLabel').colSpan = esPrepa ? 3 : 4;
     }
