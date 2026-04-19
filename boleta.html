@@ -5,7 +5,6 @@
     <title>Consulta de calificaciones - Colegio Niños Héroes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
         :root { --azul-id: #193E9A; --verde-id: #2D8B7D; }
@@ -179,7 +178,6 @@
     </footer>
 
 <script>
-    // ID de tu hoja y lista de pestañas
     const sheetID = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6m0pTs'; 
     const niveles = [
         'Maternal', 'Kinder 1', 'Kinder 2', 'Kinder 3', 
@@ -198,113 +196,92 @@
             return;
         }
 
-        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando mediante rastreo exhaustivo...";
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Extrayendo información...";
         let alumnoEncontrado = null;
         let nivelEncontrado = "";
 
         for (let nivel of niveles) {
-            // Se agrega un timestamp (cb) para obligar a Google a dar datos frescos
             const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nivel)}&tqx=cb:${Date.now()}`;
             
             try {
                 const res = await fetch(url);
                 const csvText = await res.text();
                 const data = Papa.parse(csvText, { header: false, skipEmptyLines: false }).data;
-                
-                // 1. Identificar filas según tu estructura
-                const filaMateriasNombres = data[0]; // Fila 1 del Excel
-                const filaPeriodos = data[1];       // Fila 2 del Excel
-                const registrosAlumnos = data.slice(2); // Alumnos empiezan en Fila 3
 
-                // Buscar alumno por matrícula en la primera columna
+                // Fila 0: Materias, Fila 1: Periodos, Fila 2+: Datos
+                const filaMaterias = data[0]; 
+                const registrosAlumnos = data.slice(2);
+
                 const filaAlumno = registrosAlumnos.find(row => 
                     row[0] && row[0].toString().trim().toUpperCase() === matriculaInput
                 );
 
                 if (filaAlumno) {
                     const esPrepa = nivel.toLowerCase().includes('preparatoria');
-                    
-                    // Función para limpiar y formatear a 1 decimal sin redondear (7.6)
                     const fmt = (val) => {
-                        if (val === undefined || val === null || val === "" || val === "-") return null;
-                        if (isNaN(val)) return val;
+                        if (!val || val === '-' || isNaN(val) || val.toString().trim() === "") return "-";
                         return (Math.floor(parseFloat(val) * 10) / 10).toFixed(1);
                     };
 
                     alumnoEncontrado = {
-                        Nombre: filaAlumno[1],
-                        Matricula: filaAlumno[0],
-                        Ciclo: filaAlumno[2] || '2025-2026',
-                        Grado: filaAlumno[3] || '---',
-                        Grupo: filaAlumno[4] || '---',
-                        Materias: []
+                        Nombre: filaAlumno[1], Matricula: filaAlumno[0], Ciclo: filaAlumno[2] || '2025-2026',
+                        Grado: filaAlumno[3], Grupo: filaAlumno[4], Materias: []
                     };
 
-                    // 2. LÓGICA DE MUESTREO (Alternativa 1): 
-                    // Escaneamos todas las columnas desde la F (índice 5) en adelante
-                    let materiasTemp = {};
-                    
+                    // LÓGICA DE MUESTREO (Alternativa 1 Mejorada)
+                    let materiasDict = {};
                     for (let i = 5; i < filaAlumno.length; i++) {
-                        let notaRaw = filaAlumno[i];
+                        let nombreMat = filaMaterias[i] ? filaMaterias[i].trim() : "";
                         
-                        // Si la celda tiene contenido, buscamos a qué materia pertenece
-                        if (notaRaw && notaRaw.toString().trim() !== "") {
-                            let nombreMateria = "";
-                            
-                            // Rastreo hacia atrás en la Fila 1 para encontrar el nombre (celdas combinadas)
+                        // Si el nombre está vacío (por si no repetiste alguno), busca hacia la izquierda
+                        if (nombreMat === "") {
                             for (let j = i; j >= 5; j--) {
-                                if (filaMateriasNombres[j] && filaMateriasNombres[j].trim() !== "") {
-                                    nombreMateria = filaMateriasNombres[j].trim();
+                                if (filaMaterias[j] && filaMaterias[j].trim() !== "") {
+                                    nombreMat = filaMaterias[j].trim();
                                     break;
                                 }
                             }
+                        }
 
-                            // Ignorar si la columna pertenece al Promedio Final de la materia o del ciclo
-                            if (nombreMateria && !nombreMateria.toUpperCase().includes("PROMEDIO")) {
-                                if (!materiasTemp[nombreMateria]) materiasTemp[nombreMateria] = [];
-                                let notaFmt = fmt(notaRaw);
-                                if (notaFmt !== null) materiasTemp[nombreMateria].push(notaFmt);
-                            }
+                        if (nombreMat && !nombreMat.toUpperCase().includes("PROMEDIO")) {
+                            if (!materiasDict[nombreMat]) materiasDict[nombreMat] = [];
+                            materiasDict[nombreMat].push(fmt(filaAlumno[i]));
                         }
                     }
 
-                    // 3. Organizar las notas recolectadas en el objeto final
-                    for (let nombre in materiasTemp) {
-                        let notas = materiasTemp[nombre];
-                        // Solo agregamos si hay notas registradas
-                        if (notas.length > 0) {
-                            alumnoEncontrado.Materias.push({
-                                nombre: nombre,
-                                n1: notas[0] || '-',
-                                n2: notas[1] || '-',
-                                n3: esPrepa ? null : (notas[2] || '-'),
-                                nf: esPrepa ? (notas[2] || '-') : (notas[3] || '-')
-                            });
-                        }
+                    // Convertir el diccionario a la estructura de la tabla
+                    for (let nombre in materiasDict) {
+                        let notas = materiasDict[nombre];
+                        alumnoEncontrado.Materias.push({
+                            nombre: nombre,
+                            n1: notas[0] || '-',
+                            n2: notas[1] || '-',
+                            n3: esPrepa ? null : (notas[2] || '-'),
+                            nf: esPrepa ? (notas[2] || '-') : (notas[3] || '-')
+                        });
                     }
 
-                    // 4. Buscar el Promedio General (último valor numérico de la fila)
-                    let promedioFinal = "-";
+                    // Buscar el Promedio General Final (último número de la fila)
+                    let promFinal = "-";
                     for (let k = filaAlumno.length - 1; k >= 5; k--) {
-                        let val = filaAlumno[k];
-                        if (val && !isNaN(val) && val.toString().trim() !== "") {
-                            promedioFinal = fmt(val);
+                        if (filaAlumno[k] && !isNaN(filaAlumno[k]) && filaAlumno[k].toString().trim() !== "") {
+                            promFinal = fmt(filaAlumno[k]);
                             break;
                         }
                     }
-                    alumnoEncontrado.PromedioFinalCiclo = promedioFinal;
+                    alumnoEncontrado.PromedioFinalCiclo = promFinal;
 
                     nivelEncontrado = nivel;
                     break; 
                 }
-            } catch (e) { console.error("Error en nivel " + nivel, e); }
+            } catch (e) { console.error("Error en " + nivel, e); }
         }
 
         if (alumnoEncontrado) {
-            status.innerHTML = "<span class='text-success'>¡Boleta generada con éxito!</span>";
+            status.innerHTML = "<span class='text-success'>¡Boleta generada!</span>";
             renderBoleta(alumnoEncontrado, nivelEncontrado);
         } else {
-            status.innerHTML = `<span class='text-danger'>Matrícula '${matriculaInput}' no encontrada. Verifique que el archivo esté publicado y la matrícula sea correcta.</span>`;
+            status.innerHTML = `<span class='text-danger'>Matrícula '${matriculaInput}' no encontrada.</span>`;
             document.getElementById('reportCard').style.display = 'none';
         }
     }
@@ -319,13 +296,7 @@
 
         const esPrepa = nivel.toLowerCase().includes('preparatoria');
         let hHead = `<tr><th style="text-align:left; width:40%;">Materia / Asignatura</th>`;
-        
-        // Encabezados dinámicos según nivel
-        if (esPrepa) {
-            hHead += `<th>Semestre 1</th><th>Semestre 2</th>`;
-        } else {
-            hHead += `<th>Trimestre 1</th><th>Trimestre 2</th><th>Trimestre 3</th>`;
-        }
+        hHead += esPrepa ? `<th>Semestre 1</th><th>Semestre 2</th>` : `<th>Trimestre 1</th><th>Trimestre 2</th><th>Trimestre 3</th>`;
         hHead += `<th>Final</th></tr>`;
         document.getElementById('tableHeader').innerHTML = hHead;
 
@@ -337,11 +308,9 @@
             hBody += `<td style="font-weight:bold; background:#f9f9f9; color:#193E9A;">${m.nf}</td></tr>`;
         });
 
-        document.getElementById('gradeRows').innerHTML = hBody || "<tr><td colspan='5'>No se encontraron materias con calificaciones.</td></tr>";
+        document.getElementById('gradeRows').innerHTML = hBody;
         document.getElementById('displayPromedio').innerText = alumno.PromedioFinalCiclo;
         document.getElementById('promedioLabel').colSpan = esPrepa ? 3 : 4;
-        
-        // Scroll suave hacia la boleta
         setTimeout(() => document.getElementById('reportCard').scrollIntoView({ behavior: 'smooth' }), 100);
     }
 </script>
