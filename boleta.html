@@ -181,7 +181,7 @@
 <script>
     const sheetID = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6m0pTs'; 
     
-    // Lista completa y ordenada de pestañas para la búsqueda
+    // Lista completa de pestañas actualizada
     const niveles = [
         'Maternal', 
         'Kinder 1', 'Kinder 2', 'Kinder 3', 
@@ -200,7 +200,7 @@
             return;
         }
 
-        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando en los registros escolares...";
+        status.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Buscando en los registros...";
         let alumnoEncontrado = null;
         let nivelEncontrado = "";
 
@@ -216,20 +216,18 @@
                 
                 if (data.length < 2) continue;
 
-                const filaMateriasRaw = data[0]; // Fila 1 (Nombres de materias combinadas)
-                const filaEncabezados = data[1]; // Fila 2 (Matricula, Nombre, Ciclo...)
+                const filaMateriasRaw = data[0]; // Fila 1: Nombres de materias
+                const filaEncabezados = data[1]; // Fila 2: Encabezados técnicos
                 const registros = data.slice(2);
 
                 const limpiar = (t) => t ? t.toString().trim().toUpperCase() : "";
-                
-                // Buscar matrícula en la Columna A
                 const filaAlumno = registros.find(row => limpiar(row[0]) === matriculaInput);
 
                 if (filaAlumno) {
                     const esPrepa = nivel.toLowerCase().includes('preparatoria');
                     const saltoMateria = esPrepa ? 3 : 4;
 
-                    // Formato: 1 decimal sin redondeo agresivo (7.6 permanece como 7.6)
+                    // Formato de 1 decimal exacto (ej. 7.6)
                     const fmt = (val) => {
                         if (!val || val === '-' || isNaN(val)) return val || '-';
                         return (Math.floor(parseFloat(val) * 10) / 10).toFixed(1);
@@ -244,10 +242,10 @@
                         Materias: []
                     };
 
-                    // EXTRAER MATERIAS (Desde Columna F / Índice 5)
+                    // Extraer materias desde columna F (índice 5)
                     for (let i = 5; i < filaEncabezados.length; i += saltoMateria) {
                         let nombreMateria = "";
-                        // Lógica para celdas combinadas: buscar nombre hacia la izquierda en fila 1
+                        // Buscar el nombre en la fila 1 (manejando celdas combinadas)
                         for (let j = i; j >= 5; j--) {
                             if (filaMateriasRaw[j] && filaMateriasRaw[j].trim() !== "") {
                                 nombreMateria = filaMateriasRaw[j].trim();
@@ -266,14 +264,11 @@
                         }
                     }
 
-                    // Promedio Final: Último dato con valor en la fila
-                    let valorPromedio = filaAlumno[filaAlumno.length - 1];
-                    alumnoEncontrado.PromedioFinalCiclo = fmt(valorPromedio);
-                    
+                    alumnoEncontrado.PromedioFinalCiclo = fmt(filaAlumno[filaAlumno.length - 1]);
                     nivelEncontrado = nivel;
                     break; 
                 }
-            } catch (e) { console.error("Error buscando en: " + nivel); }
+            } catch (e) { console.error("Error en: " + nivel); }
         }
 
         if (alumnoEncontrado) {
@@ -296,7 +291,6 @@
         const esPrepa = nivel.toLowerCase().includes('preparatoria');
         let hHead = `<tr><th style="text-align:left; width:40%;">Materia / Asignatura</th>`;
         
-        // Encabezados con nombres completos
         if (esPrepa) {
             hHead += `<th>Semestre 1</th><th>Semestre 2</th>`;
         } else {
@@ -316,8 +310,6 @@
         document.getElementById('gradeRows').innerHTML = hBody;
         document.getElementById('displayPromedio').innerText = alumno.PromedioFinalCiclo;
         document.getElementById('promedioLabel').colSpan = esPrepa ? 3 : 4;
-        
-        setTimeout(() => document.getElementById('reportCard').scrollIntoView({ behavior: 'smooth' }), 100);
     }
 </script>
 </body>
