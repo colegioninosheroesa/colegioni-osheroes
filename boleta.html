@@ -180,8 +180,10 @@
 
 <script>
     const sheetID = '12m7RYtCBAF-P6t8_hoS3TkJwVX0tHEf7uaHAs6m0pTs'; 
-    // Lista extendida de todos tus niveles/grados
+    
+    // Lista completa y ordenada de pestañas para la búsqueda
     const niveles = [
+        'Maternal', 
         'Kinder 1', 'Kinder 2', 'Kinder 3', 
         'Primaria 1', 'Primaria 2', 'Primaria 3', 'Primaria 4', 'Primaria 5', 'Primaria 6',
         'Secundaria 1', 'Secundaria 2', 'Secundaria 3',
@@ -202,21 +204,20 @@
         let alumnoEncontrado = null;
         let nivelEncontrado = "";
 
-        // RECORRIDO DE TODAS LAS PESTAÑAS DE GRADOS
         for (let nivel of niveles) {
             const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(nivel)}&tqx=cb:${Date.now()}`;
             
             try {
                 const res = await fetch(url);
-                if (!res.ok) continue; // Si la pestaña no existe aún, se la salta
+                if (!res.ok) continue; 
 
                 const csvText = await res.text();
                 const data = Papa.parse(csvText, { header: false, skipEmptyLines: true }).data;
                 
                 if (data.length < 2) continue;
 
-                const filaMateriasRaw = data[0]; 
-                const filaEncabezados = data[1]; 
+                const filaMateriasRaw = data[0]; // Fila 1 (Nombres de materias combinadas)
+                const filaEncabezados = data[1]; // Fila 2 (Matricula, Nombre, Ciclo...)
                 const registros = data.slice(2);
 
                 const limpiar = (t) => t ? t.toString().trim().toUpperCase() : "";
@@ -225,13 +226,12 @@
                 const filaAlumno = registros.find(row => limpiar(row[0]) === matriculaInput);
 
                 if (filaAlumno) {
-                    // Determinar si es preparatoria para el formato de 3 o 4 columnas
                     const esPrepa = nivel.toLowerCase().includes('preparatoria');
                     const saltoMateria = esPrepa ? 3 : 4;
 
+                    // Formato: 1 decimal sin redondeo agresivo (7.6 permanece como 7.6)
                     const fmt = (val) => {
                         if (!val || val === '-' || isNaN(val)) return val || '-';
-                        // Truncar a 1 decimal para que 7.6 sea 7.6 y no 7.7
                         return (Math.floor(parseFloat(val) * 10) / 10).toFixed(1);
                     };
 
@@ -266,8 +266,10 @@
                         }
                     }
 
-                    // Promedio Final: Último dato de la fila
-                    alumnoEncontrado.PromedioFinalCiclo = fmt(filaAlumno[filaAlumno.length - 1]);
+                    // Promedio Final: Último dato con valor en la fila
+                    let valorPromedio = filaAlumno[filaAlumno.length - 1];
+                    alumnoEncontrado.PromedioFinalCiclo = fmt(valorPromedio);
+                    
                     nivelEncontrado = nivel;
                     break; 
                 }
@@ -278,7 +280,7 @@
             status.innerHTML = "<span class='text-success'>¡Registro encontrado!</span>";
             renderBoleta(alumnoEncontrado, nivelEncontrado);
         } else {
-            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Verifique el grado y el Excel.</span>";
+            status.innerHTML = "<span class='text-danger'>Matrícula no encontrada. Verifique los datos en el Excel.</span>";
             document.getElementById('reportCard').style.display = 'none';
         }
     }
@@ -294,6 +296,7 @@
         const esPrepa = nivel.toLowerCase().includes('preparatoria');
         let hHead = `<tr><th style="text-align:left; width:40%;">Materia / Asignatura</th>`;
         
+        // Encabezados con nombres completos
         if (esPrepa) {
             hHead += `<th>Semestre 1</th><th>Semestre 2</th>`;
         } else {
@@ -313,6 +316,8 @@
         document.getElementById('gradeRows').innerHTML = hBody;
         document.getElementById('displayPromedio').innerText = alumno.PromedioFinalCiclo;
         document.getElementById('promedioLabel').colSpan = esPrepa ? 3 : 4;
+        
+        setTimeout(() => document.getElementById('reportCard').scrollIntoView({ behavior: 'smooth' }), 100);
     }
 </script>
 </body>
