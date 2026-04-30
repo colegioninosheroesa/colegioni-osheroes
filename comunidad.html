@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Comunidad - Colegio Niños Héroes</title>
@@ -8,7 +9,22 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <style>
-        /* Estilo para el aviso general */
+        /* --- ESTILO HERO (IGUAL A NOSOTROS) --- */
+        .hero {
+            background: linear-gradient(135deg, #193E9A 0%, #317F77 100%);
+            padding: 80px 0;
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-weight: 800;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- ESTILOS DE AVISOS --- */
         .announcement-banner {
             background: #fff3cd;
             border-left: 5px solid #ffc107;
@@ -17,9 +33,12 @@
             margin-bottom: 30px;
             text-align: left;
         }
-        .announcement-title { color: #856404; font-weight: bold; }
-        
-        /* Estilo para los avisos específicos por nivel */
+
+        .announcement-title {
+            color: #856404;
+            font-weight: bold;
+        }
+
         .nivel-aviso {
             background: #f8f9fa;
             border-radius: 8px;
@@ -27,25 +46,115 @@
             margin-top: 15px;
             font-size: 0.95rem;
             color: #333;
-            border-top: 3px solid var(--azul-id);
+            border-top: 3px solid #193E9A;
             text-align: left;
             min-height: 80px;
         }
-        .nivel-aviso strong { color: var(--azul-id); display: block; margin-bottom: 5px; text-transform: uppercase; font-size: 0.75rem; }
+
+        .nivel-aviso strong {
+            color: #193E9A;
+            display: block;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+
+        /* Botón de WhatsApp Estilo Limpio (Igual a Oferta Educativa) */
+        .btn-whatsapp-nav {
+            background-color: #38b44a !important;
+            /* El verde exacto de la imagen */
+            border-color: #38b44a !important;
+            color: white !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            padding: 6px 16px !important;
+            border-radius: 6px !important;
+            font-size: 0.9rem;
+            transition: 0.2s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            border: none;
+        }
+
+        .btn-whatsapp-nav:hover {
+            background-color: #2e963d !important;
+            text-decoration: none !important;
+            transform: none;
+            /* Quitamos el salto para que sea serio */
+        }
+
+        .btn-whatsapp-nav i {
+            margin-right: 6px;
+            font-size: 1.1rem;
+        }
+
+        /* --- TARJETAS DE ACCESO (CALIFICACIONES/RECURSOS) --- */
+        .card-moderna {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: 0.3s;
+            background: #fff;
+        }
+
+        .card-moderna:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-institucional {
+            background-color: #193E9A;
+            color: white !important;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s;
+        }
+
+        .btn-institucional:hover {
+            background-color: #317F77;
+        }
+
+       .footer-colegio {
+            background-color: #193E9A;
+            padding: 30px 0;
+            margin-top: 50px;
+            color: white;
+        }
+
+        .link-unete {
+            color: white !important;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 25px;
+            display: inline-block;
+            transition: 0.3s;
+        }
+
+        .link-unete:hover {
+            background-color: white;
+            color: #193E9A !important;
+        }
     </style>
 </head>
+
 <body>
     <div class="top-bar d-none d-md-block">
         <div class="container d-flex justify-content-between align-items-center">
             <div><i class="fas fa-envelope mr-1"></i> informes@nh.edu.mx | 56 3403 0770</div>
-            <div><a href="#"><i class="fab fa-facebook-f"></i></a></div>
+            <div><a href="#" style="color:white;"><i class="fab fa-facebook-f"></i></a></div>
         </div>
     </div>
 
-    <nav class="navbar navbar-expand-lg sticky-top navbar-light">
+    <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="index.html">
-                <img src="Iconos/logo.png" class="logo-colegio"> Colegio Niños Héroes
+                <img src="Iconos/logo.png" style="height:40px;"> Colegio Niños Héroes
             </a>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto align-items-center">
@@ -53,16 +162,23 @@
                     <li class="nav-item"><a class="nav-link" href="oferta.html">Oferta Educativa</a></li>
                     <li class="nav-item"><a class="nav-link active" href="comunidad.html">Comunidad</a></li>
                     <li class="nav-item"><a class="nav-link mr-lg-3" href="contacto.html">Contacto</a></li>
-                    <li class="nav-item"><a class="btn btn-whatsapp-nav" href="https://wa.me/5634030770" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                    <li class="nav-item">
+                        <a class="btn btn-whatsapp-nav" href="https://wa.me/5634030770" target="_blank">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <header class="hero"><div class="container"><h1>Comunidad Escolar</h1></div></header>
+    <header class="hero">
+        <div class="container">
+            <h1>Comunidad Escolar</h1>
+        </div>
+    </header>
 
     <section class="container mt-5">
-        
         <div class="announcement-banner">
             <div class="announcement-title"><i class="fas fa-bullhorn"></i> AVISO GENERAL</div>
             <p id="aviso-General" class="mb-0">Cargando avisos generales...</p>
@@ -71,26 +187,30 @@
         <div class="row text-center mb-5">
             <div class="col-md-3 mb-4">
                 <div class="card card-moderna p-3 h-100">
-                    <h5 style="color: var(--azul-id); font-weight: bold;">Kinder</h5>
-                    <div class="nivel-aviso"><strong>Último Aviso:</strong><span id="aviso-Kinder">Cargando...</span></div>
+                    <h5 style="color: #193E9A; font-weight: bold;">Kinder</h5>
+                    <div class="nivel-aviso"><strong>Último Aviso:</strong><span id="aviso-Kinder">Cargando...</span>
+                    </div>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="card card-moderna p-3 h-100">
-                    <h5 style="color: var(--azul-id); font-weight: bold;">Primaria</h5>
-                    <div class="nivel-aviso"><strong>Último Aviso:</strong><span id="aviso-Primaria">Cargando...</span></div>
+                    <h5 style="color: #193E9A; font-weight: bold;">Primaria</h5>
+                    <div class="nivel-aviso"><strong>Último Aviso:</strong><span id="aviso-Primaria">Cargando...</span>
+                    </div>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="card card-moderna p-3 h-100">
-                    <h5 style="color: var(--azul-id); font-weight: bold;">Secundaria</h5>
-                    <div class="nivel-aviso"><strong>Último Aviso:</strong><span id="aviso-Secundaria">Cargando...</span></div>
+                    <h5 style="color: #193E9A; font-weight: bold;">Secundaria</h5>
+                    <div class="nivel-aviso"><strong>Último Aviso:</strong><span
+                            id="aviso-Secundaria">Cargando...</span></div>
                 </div>
             </div>
             <div class="col-md-3 mb-4">
                 <div class="card card-moderna p-3 h-100">
-                    <h5 style="color: var(--azul-id); font-weight: bold;">Preparatoria</h5>
-                    <div class="nivel-aviso"><strong>Último Aviso:</strong><span id="aviso-Preparatoria">Cargando...</span></div>
+                    <h5 style="color: #193E9A; font-weight: bold;">Preparatoria</h5>
+                    <div class="nivel-aviso"><strong>Último Aviso:</strong><span
+                            id="aviso-Preparatoria">Cargando...</span></div>
                 </div>
             </div>
         </div>
@@ -100,135 +220,56 @@
         <div class="row text-center mb-5">
             <div class="col-md-6 mb-4">
                 <div class="card card-moderna p-5">
-                    <h3 style="color: var(--azul-id); margin-bottom: 25px;">Consulta de Calificaciones</h3>
+                    <h3 style="color: #193E9A; margin-bottom: 25px; font-weight: 800;">Consulta de Calificaciones</h3>
+                    <p class="text-muted mb-4">Progreso académico extracurricular y de inglés.</p>
                     <a href="boleta.html" class="btn-institucional">Acceder</a>
                 </div>
             </div>
             <div class="col-md-6 mb-4">
                 <div class="card card-moderna p-5">
-                    <h3 style="color: var(--azul-id); margin-bottom: 25px;">Recursos Escolares</h3>
+                    <h3 style="color: #193E9A; margin-bottom: 25px; font-weight: 800;">Recursos Escolares</h3>
+                    <p class="text-muted mb-4">Descarga de circulares, listas de materiales y manuales.</p>
                     <a href="recursos.html" class="btn-institucional">Acceder</a>
                 </div>
             </div>
         </div>
     </section>
 
-  <div style="margin-top: 50px; clear: both;"></div>
-<footer class="footer-colegio">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8 text-center text-md-left mb-3 mb-md-0">
-                <p class="mb-0 text-white texto-nowrap">
-                    © 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos reservados.
-                </p>
-            </div>
-            
-            <div class="col-md-4 text-center text-md-right">
-                <a href="bolsa-trabajo.html" class="link-unete">
-                    <i class="fas fa-briefcase mr-2"></i>Únete a nuestro equipo
-                </a>
+    <footer class="footer-colegio">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8 text-center text-md-left mb-3 mb-md-0">
+                    <p class="mb-0 text-white">© 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos
+                        reservados.</p>
+                </div>
+                <div class="col-md-4 text-center text-md-right">
+                    <a href="bolsa-trabajo.html" class="link-unete"><i class="fas fa-briefcase mr-2"></i>Únete a nuestro
+                        equipo</a>
+                </div>
             </div>
         </div>
-    </div>
-</footer>
+    </footer>
 
-<style>
-    .footer-colegio {
-        background-color: #193E9A;
-        padding: 30px 0;
-        margin-top: 50px;
-        color: white;
-    }
-
-    /* Esta regla evita que el texto se divida en dos renglones */
-    .texto-nowrap {
-        white-space: nowrap;
-        font-size: 0.95rem; /* Ajuste ligero de tamaño para asegurar espacio */
-    }
-
-    .link-unete {
-        color: white !important;
-        font-weight: 600;
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-        padding: 8px 18px;
-        border: 1px solid rgba(255, 255, 255, 0.6);
-        border-radius: 25px;
-        display: inline-block;
-        white-space: nowrap; /* Evita que el botón también se deforme */
-    }
-
-    .link-unete:hover {
-        background-color: white;
-        color: #193E9A !important;
-        text-decoration: none;
-    }
-
-    /* Ajuste para tablets y pantallas pequeñas */
-    @media (max-width: 991px) {
-        .texto-nowrap {
-            font-size: 0.85rem;
-        }
-    }
-
-    /* En celulares muy pequeños sí permitimos que se divida para que no se salga de la pantalla */
-    @media (max-width: 576px) {
-        .texto-nowrap {
-            white-space: normal;
-            font-size: 0.9rem;
-        }
-    }
-</style>
-   <script>
-    // 1. ID de tu archivo de Anuncios
-    const idAnuncios = '18JCUK-SGSQCXMvWng3O3hZYxD4GU_BVILkvO_tawDZo';
-
-    function cargarAviso(pestana) {
-        // La URL con 'gviz/tq' es la más confiable para leer pestañas específicas
-        const url = `https://docs.google.com/spreadsheets/d/${idAnuncios}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(pestana)}`;
-        
-        Papa.parse(url, {
-            download: true,
-            complete: function(results) {
-                // Filtramos las filas para ignorar las que estén totalmente vacías
-                const filasConDatos = results.data.filter(fila => fila[0] && fila[0].trim() !== "");
-                
-                const elemento = document.getElementById(`aviso-${pestana}`);
-                if (!elemento) return;
-
-                if (filasConDatos.length > 0) {
-                    /* LÓGICA INTELIGENTE:
-                       - Si la pestaña es 'General' y tiene más de una fila, tomamos la segunda (A2).
-                       - Si no, o si es cualquier otra pestaña, tomamos la primera fila que tenga texto.
-                    */
-                    if (pestana === 'General' && filasConDatos.length > 1) {
-                        elemento.innerText = filasConDatos[1][0];
-                    } else {
-                        elemento.innerText = filasConDatos[0][0];
-                    }
-                } else {
-                    elemento.innerText = "Sin avisos recientes por el momento.";
+    <script>
+        const idAnuncios = '18JCUK-SGSQCXMvWng3O3hZYxD4GU_BVILkvO_tawDZo';
+        function cargarAviso(pestana) {
+            const url = `https://docs.google.com/spreadsheets/d/${idAnuncios}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(pestana)}`;
+            Papa.parse(url, {
+                download: true,
+                complete: function (results) {
+                    const filasConDatos = results.data.filter(fila => fila[0] && fila[0].trim() !== "");
+                    const elemento = document.getElementById(`aviso-${pestana}`);
+                    if (!elemento) return;
+                    if (filasConDatos.length > 0) {
+                        elemento.innerText = (pestana === 'General' && filasConDatos.length > 1) ? filasConDatos[1][0] : filasConDatos[0][0];
+                    } else { elemento.innerText = "Sin avisos recientes."; }
                 }
-            },
-            error: function(err) {
-                console.error("Error al conectar con la pestaña: " + pestana, err);
-                const elemento = document.getElementById(`aviso-${pestana}`);
-                if (elemento) elemento.innerText = "Error al cargar aviso.";
-            }
-        });
-    }
-
-    // Función que se ejecuta al cargar la página
-    window.onload = function() {
-        // Lista exacta de tus pestañas en el Excel
-        const seccionesAnuncios = ['General', 'Kinder', 'Primaria', 'Secundaria', 'Preparatoria'];
-        
-        // Lanzamos la carga de todas las pestañas simultáneamente
-        seccionesAnuncios.forEach(s => {
-            cargarAviso(s);
-        });
-    };
-</script>
+            });
+        }
+        window.onload = function () {
+            ['General', 'Kinder', 'Primaria', 'Secundaria', 'Preparatoria'].forEach(s => cargarAviso(s));
+        };
+    </script>
 </body>
+
 </html>

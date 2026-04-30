@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Contacto e Inscripciones - Colegio Niños Héroes</title>
@@ -7,52 +8,185 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Estilos para el Footer */
-        .footer-colegio { background-color: #193E9A; padding: 30px 0; margin-top: 50px; color: white; }
-        .texto-nowrap { white-space: nowrap; font-size: 0.95rem; }
-        .link-unete {
-            color: white !important; font-weight: 600; text-decoration: none; font-size: 0.9rem;
-            transition: all 0.3s ease; padding: 8px 18px; border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 25px; display: inline-block; white-space: nowrap;
+        /* --- ESTILO HERO CON DEGRADADO --- */
+        .hero {
+            background: linear-gradient(135deg, #193E9A 0%, #317F77 100%);
+            padding: 80px 0;
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
         }
-        .link-unete:hover { background-color: white; color: #193E9A !important; }
 
-        /* Corrección de visibilidad para Selectores */
+        .hero h1 {
+            font-weight: 800;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- BOTÓN WHATSAPP PREMIUM (IGUAL A NOSOTROS) --- */
+        .btn-whatsapp-custom {
+            background-color: #38b44a !important;
+            border-color: #38b44a !important;
+            color: white !important;
+            font-weight: 800 !important;
+            text-transform: uppercase;
+            padding: 10px 20px !important;
+            border-radius: 10px !important;
+            transition: 0.3s;
+        }
+
+        .btn-whatsapp-custom:hover {
+            background-color: #2e963d !important;
+            transform: scale(1.05);
+        }
+
+        /* --- ESTILOS DEL FORMULARIO --- */
+        .form-container {
+            border-radius: 15px;
+            border: 1px solid #eee;
+        }
+
         select.form-control {
-            color: #495057 !important; /* Gris oscuro para el texto */
+            color: #495057 !important;
             background-color: #ffffff !important;
             height: auto !important;
             padding: 10px !important;
         }
-        
-        select.form-control option {
-            color: #212529 !important;
-            background-color: #fff !important;
+
+        .form-control {
+            margin-bottom: 15px;
+            border-radius: 8px;
         }
 
-        .form-control { margin-bottom: 15px; border-radius: 8px; }
-        
-        .btn-institucional { 
-            background-color: #193E9A; color: white; border: none; padding: 12px 30px; 
-            border-radius: 25px; font-weight: bold; transition: 0.3s; width: 100%;
+        .btn-institucional {
+            background-color: #193E9A;
+            color: white !important;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: 0.3s;
+            width: 100%;
+            text-transform: uppercase;
         }
-        .btn-institucional:hover { background-color: #0d2561; cursor: pointer; color: white; }
-        
-        @media (max-width: 576px) { .texto-nowrap { white-space: normal; } }
+
+        .btn-institucional:hover {
+            background-color: #317F77;
+            transform: translateY(-2px);
+            cursor: pointer;
+        }
+
+        /* Estilo unificado para el botón de WhatsApp en el Nav */
+        .btn-whatsapp-custom {
+            background-color: #38b44a !important;
+            border-color: #38b44a !important;
+            color: white !important;
+            font-weight: 800 !important;
+            text-transform: uppercase;
+            /* Esto lo pone en MAYÚSCULAS como en Oferta */
+            padding: 8px 20px !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            /* La sombra que le falta a Comunidad */
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-whatsapp-custom:hover {
+            background-color: #2e963d !important;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            /* Sombra más fuerte al pasar el mouse */
+            transform: translateY(-1px);
+            color: white !important;
+        }
+
+        .btn-whatsapp-custom i {
+            margin-right: 8px;
+            /* Espacio entre el icono y el texto */
+        }
+
+        /* Botón de WhatsApp Estilo Limpio (Igual a Oferta Educativa) */
+        .btn-whatsapp-nav {
+            background-color: #38b44a !important;
+            /* El verde exacto de la imagen */
+            border-color: #38b44a !important;
+            color: white !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            padding: 6px 16px !important;
+            border-radius: 6px !important;
+            font-size: 0.9rem;
+            transition: 0.2s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            border: none;
+        }
+
+        .btn-whatsapp-nav:hover {
+            background-color: #2e963d !important;
+            text-decoration: none !important;
+            transform: none;
+            /* Quitamos el salto para que sea serio */
+        }
+
+        .btn-whatsapp-nav i {
+            margin-right: 6px;
+            font-size: 1.1rem;
+        }
+
+        /* --- FOOTER --- */
+        .footer-colegio {
+            background-color: #193E9A;
+            padding: 35px 0;
+            margin-top: 50px;
+            color: white;
+        }
+
+        .texto-nowrap {
+            white-space: nowrap;
+            font-size: 0.95rem;
+        }
+
+        .link-unete {
+            color: white !important;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            padding: 8px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 25px;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .link-unete:hover {
+            background-color: white;
+            color: #193E9A !important;
+            text-decoration: none;
+        }
+
+        @media (max-width: 576px) {
+            .texto-nowrap {
+                white-space: normal;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="top-bar d-none d-md-block">
         <div class="container d-flex justify-content-between align-items-center">
             <div><i class="fas fa-envelope mr-1"></i> informes@nh.edu.mx | 56 3403 0770</div>
-            <div><a href="#"><i class="fab fa-facebook-f"></i></a></div>
+            <div><a href="#" style="color:white;"><i class="fab fa-facebook-f"></i></a></div>
         </div>
     </div>
 
     <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand" href="index.html">
-                <img src="Iconos/logo.png" class="logo-colegio" alt="Logo" style="height: 50px;"> Colegio Niños Héroes
+                <img src="Iconos/logo.png" alt="Logo" style="height: 40px;"> Colegio Niños Héroes
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -73,23 +207,28 @@
         </div>
     </nav>
 
-    <header class="hero" style="background: #193E9A; color: white; padding: 60px 0; text-align: center;">
+    <header class="hero">
         <div class="container">
-            <h1 style="font-weight: 800;">Informes e Inscripciones</h1>
+            <h1>Informes e Inscripciones</h1>
         </div>
     </header>
 
-    <section class="container mt-5">
-        <div class="form-container bg-white p-4 shadow-sm" style="border-radius: 15px;">
+    <section class="container mt-5 mb-5">
+        <div class="form-container bg-white p-5 shadow-sm">
             <form action="https://formspree.io/f/xzdydopz" method="POST">
-                
-                <h4 style="color: #193E9A; margin-bottom: 20px; font-weight: 700;">Información del Alumno</h4>
+
+                <h4
+                    style="color: #193E9A; margin-bottom: 25px; font-weight: 800; text-transform: uppercase; font-size: 1.2rem;">
+                    <i class="fas fa-user-graduate mr-2"></i>Información del Alumno
+                </h4>
                 <div class="row">
                     <div class="col-md-6">
-                        <input type="text" name="alumno_nombre" class="form-control" placeholder="Nombre(s) del alumno *" required>
+                        <input type="text" name="alumno_nombre" class="form-control"
+                            placeholder="Nombre(s) del alumno *" required>
                     </div>
                     <div class="col-md-3">
-                        <input type="text" name="alumno_apellido_p" class="form-control" placeholder="Primer apellido *" required>
+                        <input type="text" name="alumno_apellido_p" class="form-control" placeholder="Primer apellido *"
+                            required>
                     </div>
                     <div class="col-md-3">
                         <input type="text" name="alumno_apellido_m" class="form-control" placeholder="Segundo apellido">
@@ -120,22 +259,28 @@
                     </div>
                 </div>
 
-                <h4 class="mt-4" style="color: #193E9A; margin-bottom: 20px; font-weight: 700;">Datos del Padre o Tutor</h4>
+                <h4 class="mt-5"
+                    style="color: #193E9A; margin-bottom: 25px; font-weight: 800; text-transform: uppercase; font-size: 1.2rem;">
+                    <i class="fas fa-user-friends mr-2"></i>Datos del Padre o Tutor
+                </h4>
                 <div class="row">
                     <div class="col-md-6">
-                        <input type="text" name="tutor_nombre" class="form-control" placeholder="Nombre completo del tutor *" required>
+                        <input type="text" name="tutor_nombre" class="form-control"
+                            placeholder="Nombre completo del tutor *" required>
                     </div>
                     <div class="col-md-6">
-                        <input type="email" name="tutor_email" class="form-control" placeholder="Correo electrónico de contacto *" required>
+                        <input type="email" name="tutor_email" class="form-control"
+                            placeholder="Correo electrónico de contacto *" required>
                     </div>
                     <div class="col-md-12 mt-2">
-                        <input type="tel" name="tutor_whatsapp" class="form-control" placeholder="Número de WhatsApp (10 dígitos) *" required>
+                        <input type="tel" name="tutor_whatsapp" class="form-control"
+                            placeholder="Número de WhatsApp (10 dígitos) *" required>
                     </div>
                 </div>
 
                 <input type="hidden" name="_subject" value="Nueva Solicitud de Informes - Colegio Niños Héroes">
                 <input type="hidden" name="_language" value="es">
-                
+
                 <button type="submit" class="btn-institucional mt-4">Enviar Solicitud de Información</button>
             </form>
         </div>
@@ -161,4 +306,5 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
+
 </html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Oferta Educativa - Colegio Niños Héroes</title>
@@ -7,7 +8,82 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* ESTILOS DE ENLACE PARA LAS TARJETAS */
+        /* --- ESTILO HERO CON DEGRADADO (IGUAL A OFERTA EDUCATIVA) --- */
+        .hero {
+            background: linear-gradient(135deg, #193E9A 0%, #317F77 100%);
+            padding: 80px 0;
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-weight: 800;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- ESTILOS DE NIVELES (NUEVO DISEÑO) --- */
+        .card-nivel {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            padding-top: 25px;
+            background: #fff;
+            height: 100%;
+        }
+
+        .card-nivel:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(25, 62, 154, 0.1);
+        }
+
+        .nivel-icon-box {
+            width: 70px;
+            height: 70px;
+            background: #f0f7f6;
+            color: #317F77;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            font-size: 1.8rem;
+        }
+
+        .card-nivel h5 {
+            color: #193E9A;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .divider-sm {
+            width: 40px;
+            height: 3px;
+            background: #317F77;
+            margin: 10px auto;
+            border-radius: 2px;
+        }
+
+        /* --- SOLUCIÓN TEXTO JUSTIFICADO COMPACTO --- */
+        .card-nivel p {
+            font-size: 0.92rem;
+            color: #555;
+            line-height: 1.5;
+            text-align: justify;
+            text-justify: inter-word;
+            /* Distribución natural de espacios */
+            hyphens: auto;
+            /* Corta palabras largas */
+            -webkit-hyphens: auto;
+            padding: 0 15px 15px;
+            margin-bottom: 0;
+        }
+
+        /* --- ESTILOS ORIGINALES PARA TARJETAS EXTRAS --- */
         .card-link {
             text-decoration: none !important;
             display: block;
@@ -21,6 +97,7 @@
             position: relative;
             padding-bottom: 10px;
         }
+
         .section-title::after {
             content: '';
             width: 60px;
@@ -37,43 +114,97 @@
             border-radius: 15px;
             transition: 0.3s;
             background: #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
             cursor: pointer;
         }
 
-        /* EFECTO AL PASAR EL MOUSE */
         .card-link:hover .card-extra {
             transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
             background-color: #f8fbff;
         }
 
         .card-extra i {
             color: #317F77;
-            font-size: 1.8rem; /* Un poco más grande para destacar */
+            font-size: 1.8rem;
             margin-bottom: 12px;
         }
+
         .card-extra h6 {
             font-weight: 700;
             color: #193E9A;
             margin: 0;
             font-size: 0.95rem;
         }
+
+        .footer-colegio {
+            background-color: #193E9A;
+            padding: 30px 0;
+            margin-top: 50px;
+            color: white;
+        }
+
+        .link-unete {
+            color: white !important;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 25px;
+            display: inline-block;
+            transition: 0.3s;
+        }
+
+        .link-unete:hover {
+            background-color: white;
+            color: #193E9A !important;
+        }
+
+        /* Botón de WhatsApp Estilo Limpio (Igual a Oferta Educativa) */
+        .btn-whatsapp-nav {
+            background-color: #38b44a !important;
+            /* El verde exacto de la imagen */
+            border-color: #38b44a !important;
+            color: white !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            padding: 6px 16px !important;
+            border-radius: 6px !important;
+            font-size: 0.9rem;
+            transition: 0.2s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            border: none;
+        }
+
+        .btn-whatsapp-nav:hover {
+            background-color: #2e963d !important;
+            text-decoration: none !important;
+            transform: none;
+            /* Quitamos el salto para que sea serio */
+        }
+
+        .btn-whatsapp-nav i {
+            margin-right: 6px;
+            font-size: 1.1rem;
+        }
     </style>
 </head>
+
 <body>
-   <div class="top-bar d-none d-md-block">
+    <div class="top-bar d-none d-md-block">
         <div class="container d-flex justify-content-between align-items-center">
             <div><i class="fas fa-envelope mr-1"></i> informes@nh.edu.mx | 56 3403 0770</div>
-            <div><a href="#"><i class="fab fa-facebook-f"></i></a></div>
+            <div><a href="#" style="color:white"><i class="fab fa-facebook-f"></i></a></div>
         </div>
     </div>
 
-    <nav class="navbar navbar-expand-lg sticky-top navbar-light">
+    <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-white">
         <div class="container">
             <a class="navbar-brand" href="index.html">
-                <img src="Iconos/logo.png" class="logo-colegio"> Colegio Niños Héroes
+                <img src="Iconos/logo.png" class="logo-colegio" style="height:40px;"> Colegio Niños Héroes
             </a>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto align-items-center">
@@ -81,263 +212,173 @@
                     <li class="nav-item"><a class="nav-link active" href="oferta.html">Oferta Educativa</a></li>
                     <li class="nav-item"><a class="nav-link" href="comunidad.html">Comunidad</a></li>
                     <li class="nav-item"><a class="nav-link mr-lg-3" href="contacto.html">Contacto</a></li>
-                    <li class="nav-item"><a class="btn btn-whatsapp-nav" href="https://wa.me/5634030770" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                    <li class="nav-item">
+                        <a class="btn btn-whatsapp-nav" href="https://wa.me/5634030770" target="_blank">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <header class="hero"><div class="container"><h1>Nuestra Oferta Educativa</h1></div></header>
+    <header class="hero">
+        <div class="container">
+            <h1>Oferta Educativa</h1>
+        </div>
+    </header>
 
     <section class="container text-center mb-5">
         <h2 class="section-title">Niveles Académicos</h2>
         <div class="row">
-            <div class="col-md-3"><div class="card card-moderna p-4"><h5>Preescolar</h5><p>Desarrollo lúdico.</p></div></div>
-            <div class="col-md-3"><div class="card card-moderna p-4"><h5>Primaria</h5><p>Excelencia bilingüe.</p></div></div>
-            <div class="col-md-3"><div class="card card-moderna p-4"><h5>Secundaria</h5><p>Liderazgo joven.</p></div></div>
-            <div class="col-md-3"><div class="card card-moderna p-4"><h5>Preparatoria</h5><p>Nivel pre-universitario.</p></div></div>
+            <div class="col-md-3 mb-4">
+                <div class="card card-nivel">
+                    <div class="nivel-icon-box"><i class="fas fa-paint-brush"></i></div>
+                    <h5>Preescolar</h5>
+                    <div class="divider-sm"></div>
+                    <p>No es solo jugar; es descubrir el mundo. Convertimos cada pregunta en una aventura bilingüe,
+                        sembrando confianza en un entorno seguro.</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card card-nivel">
+                    <div class="nivel-icon-box"><i class="fas fa-rocket"></i></div>
+                    <h5>Primaria</h5>
+                    <div class="divider-sm"></div>
+                    <p>¡Energía y aprendizaje activo! A través del deporte y la tecnología, formamos mentes curiosas con
+                        valores de respeto y disciplina.</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card card-nivel">
+                    <div class="nivel-icon-box"><i class="fas fa-users"></i></div>
+                    <h5>Secundaria</h5>
+                    <div class="divider-sm"></div>
+                    <p>El momento de encontrar tu propia voz. Impulsamos el pensamiento crítico para superar retos y
+                        construir las bases de tu futuro.</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="card card-nivel">
+                    <div class="nivel-icon-box"><i class="fas fa-graduation-cap"></i></div>
+                    <h5>Preparatoria</h5>
+                    <div class="divider-sm"></div>
+                    <p>Tu plataforma de lanzamiento. Liderazgo e investigación para transformar tu entorno y conquistar
+                        tus metas universitarias.</p>
+                </div>
+            </div>
         </div>
 
         <h2 class="section-title">Materias Extracurriculares</h2>
         <div class="row mt-4">
-            <div class="col-6 col-md-3">
-                <a href="info-musica.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-music"></i>
+            <div class="col-6 col-md-3"><a href="info-musica.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-music"></i>
                         <h6>Música</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="info-mate.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-calculator"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="info-mate.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-calculator"></i>
                         <h6>Matemáticas Divertidas</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="info-digital.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-laptop-code"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="info-digital.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-laptop-code"></i>
                         <h6>Herramientas Digitales</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="info-robotica.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-robot"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="info-robotica.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-robot"></i>
                         <h6>Robótica</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="info-ajedrez.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-chess-knight"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="info-ajedrez.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-chess-knight"></i>
                         <h6>Ajedrez</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="info-tkd.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-fist-raised"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="info-tkd.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-fist-raised"></i>
                         <h6>Taekwondo</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="info-danza.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-shoe-prints"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="info-danza.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-shoe-prints"></i>
                         <h6>Danza</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="info-americano.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-football-ball"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="info-americano.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-football-ball"></i>
                         <h6>Tocho Bandera</h6>
                     </div>
-                </a>
-            </div>
+                </a></div>
         </div>
 
         <h2 class="section-title">After School</h2>
         <div class="row mt-4">
-            <div class="col-6 col-md-3">
-                <a href="after-italiano.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-monument"></i>
+            <div class="col-6 col-md-3"><a href="after-italiano.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-monument"></i>
                         <h6>Italiano</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="after-pintura.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-palette"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="after-pintura.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-palette"></i>
                         <h6>Artes y Pintura</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="after-manualidades.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-cut"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="after-manualidades.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-cut"></i>
                         <h6>Manualidades</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="after-destrezas.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-puzzle-piece"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="after-destrezas.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-puzzle-piece"></i>
                         <h6>Juegos y Destrezas</h6>
                     </div>
-                </a>
-            </div>
-            
-            <div class="col-6 col-md-3">
-                <a href="after-clubtareas.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-edit"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="after-clubtareas.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-edit"></i>
                         <h6>Club de Tareas</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="after-soccer.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-futbol"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="after-soccer.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-futbol"></i>
                         <h6>Futbol Soccer</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="after-hawaiano.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-leaf"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="after-hawaiano.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-leaf"></i>
                         <h6>Hawaiano</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="after-voleibol.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-volleyball-ball"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="after-voleibol.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-volleyball-ball"></i>
                         <h6>Voleibol</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="after-porristas.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-star"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="after-porristas.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-star"></i>
                         <h6>Porristas</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="after-basquetbol.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-basketball-ball"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="after-basquetbol.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-basketball-ball"></i>
                         <h6>Basquetbol</h6>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="after-musica.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-music"></i>
-                        <h6>Música</h6>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="after-robotica.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-robot"></i>
-                        <h6>Robótica</h6>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="after-ajedrez.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-chess-knight"></i>
-                        <h6>Ajedrez</h6>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="after-tkd.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-fist-raised"></i>
-                        <h6>Taekwondo</h6>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="after-danza.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-shoe-prints"></i>
-                        <h6>Danza</h6>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="after-americano.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-football-ball"></i>
-                        <h6>Club Pumas CNH</h6>
-                    </div>
-                </a>
-            </div>
+                </a></div>
         </div>
 
         <h2 class="section-title">Regularizaciones</h2>
         <div class="row mt-4">
-            <div class="col-6 col-md-3">
-                <a href="regula-ingles.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-globe-americas"></i>
+            <div class="col-6 col-md-3"><a href="regula-ingles.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-globe-americas"></i>
                         <h6>Inglés</h6>
                     </div>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a href="regula-espanol.html" class="card-link">
-                    <div class="card card-extra p-3">
-                        <i class="fas fa-book-reader"></i>
+                </a></div>
+            <div class="col-6 col-md-3"><a href="regula-espanol.html" class="card-link">
+                    <div class="card card-extra p-3"><i class="fas fa-book-reader"></i>
                         <h6>Español</h6>
                     </div>
-                </a>
-            </div>
+                </a></div>
         </div>
     </section>
 
@@ -345,27 +386,16 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8 text-center text-md-left mb-3 mb-md-0">
-                    <p class="mb-0 text-white">
-                        © 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos reservados.
-                    </p>
+                    <p class="mb-0 text-white">© 2026 <strong>Colegio Niños Héroes Atizapán</strong>. Todos los derechos
+                        reservados.</p>
                 </div>
                 <div class="col-md-4 text-center text-md-right">
-                    <a href="bolsa-trabajo.html" class="link-unete">
-                        <i class="fas fa-briefcase mr-2"></i>Únete a nuestro equipo
-                    </a>
+                    <a href="bolsa-trabajo.html" class="link-unete"><i class="fas fa-briefcase mr-2"></i>Únete a nuestro
+                        equipo</a>
                 </div>
             </div>
         </div>
     </footer>
-
-    <style>
-        .footer-colegio { background-color: #193E9A; padding: 30px 0; margin-top: 50px; color: white; }
-        .link-unete {
-            color: white !important; font-weight: 600; text-decoration: none; font-size: 0.9rem;
-            padding: 8px 18px; border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 25px;
-            display: inline-block; transition: 0.3s;
-        }
-        .link-unete:hover { background-color: white; color: #193E9A !important; }
-    </style>
 </body>
+
 </html>

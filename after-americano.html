@@ -2,18 +2,33 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Club Pumas CNH - Colegio Niños Héroes</title>
+    <title>Tocho Bandera - Colegio Niños Héroes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* TUS COLORES INSTITUCIONALES (Necesarios para el botón) */
+        /* TUS COLORES INSTITUCIONALES */
         :root {
             --azul-id: #193E9A;
             --verde-id: #317F77;
         }
 
-        /* 1. EL DISEÑO DE BOTÓN DE VOLVER QUE SOLICITASTE */
+        /* --- ESTILO HERO CON DEGRADADO (UNIFICADO) --- */
+        .hero {
+            background: linear-gradient(135deg, #193E9A 0%, #317F77 100%);
+            padding: 80px 0;
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-weight: 800;
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* BOTÓN DE VOLVER */
         .btn-volver {
             border: 2px solid var(--azul-id);
             color: var(--azul-id);
@@ -22,7 +37,7 @@
             padding: 5px 20px;
             transition: 0.3s;
             text-decoration: none !important;
-            display: inline-block; /* Importante para el padding */
+            display: inline-block;
         }
         
         .btn-volver:hover { 
@@ -30,23 +45,12 @@
             color: white !important; 
         }
 
-        /* 2. ESTILOS ORIGINALES DE LA PLANTILLA */
-        .materia-hero {
-            background: linear-gradient(rgba(25, 62, 154, 0.8), rgba(25, 62, 154, 0.8)), 
-                        url('Iconos/patron-educativo.png'); 
-            background-size: cover;
-            color: white;
-            padding: 80px 0;
-            text-align: center;
-            border-radius: 0 0 50px 50px;
-        }
-
         .materia-content { padding: 60px 0; }
 
         .info-tag {
             display: inline-block;
             background: #eef4f3;
-            color: var(--verde-id); /* Usando tu variable */
+            color: var(--verde-id);
             padding: 5px 15px;
             border-radius: 20px;
             font-weight: 700;
@@ -74,27 +78,25 @@
             object-fit: cover;
             transition: 0.5s;
         }
-        .gallery-item img:hover {
-            transform: scale(1.1);
-        }
+        .gallery-item img:hover { transform: scale(1.1); }
 
-        .btn-inscripcion {
-            background: var(--verde-id); /* Usando tu variable */
-            color: white;
-            padding: 15px 40px;
-            border-radius: 30px;
+        /* BOTÓN WHATSAPP LIMPIO */
+        .btn-inscripcion-clean {
+            background-color: #38b44a !important;
+            color: white !important;
+            padding: 15px 35px;
+            border-radius: 10px;
             font-weight: 800;
-            font-size: 1.1rem;
+            text-transform: uppercase;
             border: none;
             transition: 0.3s;
-            text-decoration: none !important;
             display: inline-block;
+            text-decoration: none !important;
         }
-        .btn-inscripcion:hover {
-            background: var(--azul-id); /* Usando tu variable */
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        .btn-inscripcion-clean:hover {
+            background-color: #2e963d !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
     </style>
 </head>
@@ -109,9 +111,9 @@
         </div>
     </nav>
 
-    <header class="materia-hero">
+    <header class="hero">
         <div class="container">
-            <h1 style="font-weight: 900; font-size: 3.5rem;">Tocho Bandera</h1>
+            <h1>Tocho Bandera</h1>
             <p class="lead">Estrategia, agilidad y el poder del trabajo en equipo en el campo.</p>
         </div>
     </header>
@@ -123,13 +125,13 @@
                     <span class="info-tag">After School</span>
                     <h2 style="color: var(--azul-id); font-weight: 800; margin-bottom: 20px;">Sobre esta actividad</h2>
                     <p style="text-align: justify; line-height: 1.8; color: #555;">
-                        Nuestra academia de Tocho Bandera se centra en el desarrollo integral de los atletas, priorizando la agilidad y la velocidad como herramientas fundamentales del juego. Más allá del esfuerzo físico, fomentamos el conocimiento profundo del sistema y la estrategia, permitiendo que los alumnos tomen decisiones inteligentes bajo presión. En el campo, cada jugada es una oportunidad para fortalecer el liderazgo y consolidar un trabajo en equipo sólido, donde la confianza mutua es la clave para alcanzar la zona de anotación.
+                        Nuestra academia de Tocho Bandera se centra en el desarrollo integral de los atletas, priorizando la agilidad y la velocidad como herramientas fundamentales del juego. Más allá del esfuerzo físico, fomentamos el conocimiento profundo del sistema y la estrategia, permitiendo que los alumnos tomen decisiones inteligentes bajo presión. En el campo, cada jugada es una oportunidad para fortalecer el liderazgo y consolidar un trabajo en equipo sólido.
                     </p>
                     <ul class="list-unstyled mt-4">
-                        <li><i class="fas fa-check-circle text-success mr-2"></i> Formación de capitanes dentro y fuera del terreno de juego.</li>
-                        <li><i class="fas fa-check-circle text-success mr-2"></i> Entrenamiento especializado en coordinación y respuesta rápida.</li>
-                        <li><i class="fas fa-check-circle text-success mr-2"></i> Comprensión de sistemas de juego y ejecución de jugadas tácticas.</li>
-                        <li><i class="fas fa-check-circle text-success mr-2"></i> Fomento de la colaboración para el logro de objetivos comunes.</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success mr-2"></i> Formación de capitanes dentro y fuera del terreno de juego.</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success mr-2"></i> Entrenamiento especializado en coordinación y respuesta rápida.</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success mr-2"></i> Comprensión de sistemas de juego y ejecución de jugadas tácticas.</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success mr-2"></i> Fomento de la colaboración para el logro de objetivos comunes.</li>
                     </ul>
                 </div>
                 <div class="col-md-6">
@@ -149,8 +151,8 @@
             </div>
             
             <div class="text-center mt-5">
-                <a href="https://wa.me/5634030770" class="btn-inscripcion">
-                    <i class="fab fa-whatsapp mr-2"></i> Solicitar informes
+                <a href="https://wa.me/5634030770" class="btn-inscripcion-clean">
+                    <i class="fab fa-whatsapp mr-2"></i> SOLICITAR INFORMES
                 </a>
             </div>
         </div>
